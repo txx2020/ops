@@ -1,0 +1,56 @@
+server {
+    listen 443;
+    server_name eci.zdtongtu.com;
+    location / {
+        # root /usr/share/nginx/html;
+        root html;
+        index index.html index.htm;
+    }
+
+    location /securityb {
+        proxy_pass http://192.168.1.175:9018/securityb;
+        proxy_redirect default;
+    }
+    location /indicatorb {
+        proxy_pass http://192.168.1.177:9109/indicatorb;
+        proxy_redirect default;
+    }
+    #报告系统
+    location /reportb {
+        proxy_pass http://192.168.1.175:9020/reportb;
+        proxy_redirect default ;
+    }
+
+
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root html;
+    }
+
+}
+
+
+server {
+    listen 8080;
+    server_name eci.zdtongtu.com;
+    location / {
+        # root /usr/share/nginx/html;
+        root html;
+        index index.html index.htm;
+    }
+
+    location /securityb {
+        proxy_pass http://192.168.1.175:9108/securityb;
+        proxy_redirect default;
+    }
+    location /indicatorb {
+        proxy_pass http://192.168.1.177:9109/indicatorb;
+        proxy_redirect default;
+    }
+
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root html;
+    }
+
+}
