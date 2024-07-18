@@ -1,5 +1,5 @@
 ---
-# 使用前提，hw111需要免密登录t12
+# 使用前提，hw111需要免密登录t12，而且需要wh111的机器上修改hosts，添加t12的ip
 - name: Synchronize GitLab backup directory to target host
   hosts: t12
   tasks:

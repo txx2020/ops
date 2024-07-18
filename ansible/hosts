@@ -1,0 +1,28 @@
+[local]
+localhost ansible_connection=local
+
+[pi4]
+pi      ansible_ssh_host=192.168.1.207  ansible_ssh_user=txx    ansible_ssh_pass=xiao123
+
+[test]
+test2	ansible_ssh_host=10.10.10.3	ansible_ssh_user=txx	ansible_ssh_pass=xiao123 ansible_become_password=xiao123
+test3   ansible_ssh_host=10.10.10.4     ansible_ssh_user=txx    ansible_ssh_pass=xiao123 ansible_become_password=xiao123
+test4   ansible_ssh_host=10.10.10.5     ansible_ssh_user=txx    ansible_ssh_pass=xiao123 ansible_become_password=xiao123
+
+[wg]
+t9      ansible_ssh_host=10.253.129.9   ansible_ssh_user=root 	ansible_ssh_pass=tongtu&*()UIOP
+t10     ansible_ssh_host=10.253.129.10  ansible_ssh_user=root ansible_ssh_pass=tongtu&*()UIOP
+t11     ansible_ssh_host=10.253.129.11  ansible_ssh_user=root ansible_ssh_pass=tongtu&*()UIOP
+t12     ansible_ssh_host=10.253.129.12  ansible_ssh_user=tongtu   ansible_ssh_pass=ttyj7890ttyj
+t13     ansible_ssh_host=10.253.129.13  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890ttyj
+
+[wh]
+wh111     ansible_ssh_host=192.168.1.111  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890
+wh160	  ansible_ssh_host=192.168.1.160  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890
+wh147     ansible_ssh_host=192.168.1.147  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890
+wh157     ansible_ssh_host=192.168.1.157  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890
+wh167     ansible_ssh_host=192.168.1.167  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890ttyj7890
+wh177     ansible_ssh_host=192.168.1.177  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890
+wh187     ansible_ssh_host=192.168.1.187  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890
+wh197     ansible_ssh_host=192.168.1.197  ansible_ssh_user=tongtu ansible_ssh_pass=ttyj7890
+
