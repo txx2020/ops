@@ -1,0 +1,130 @@
+---
+# 批量安装二进制mysql5.6
+# 将配置文件my.cnf放到目录/apps/mysql下
+- name: 安装MySQL
+  hosts: test3
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: install libxcrypt-compat 
+      dnf:
+        name: libxcrypt-compat
+        state: installed
+        use_backend: "dnf4"
+
+    - name: 下载mysql
+      command: wget -O /tmp/mysql.tar.gz https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.44-linux-glibc2.12-x86_64.tar.gz
+      args:
+        creates: /tmp/mysql.tar.gz
+
+    - name: 检查是否已存在解压后的 MySQL 目录
+      stat:
+        path: /usr/local/
+      register: mysql_dir
+
+    - name: 查找以 'mysql' 开头的目录
+      find:
+        paths: /usr/local/
+        patterns: 'mysql*'
+        file_type: directory
+      register: mysql_dirs
+      when: mysql_dir.stat.exists
+
+    - name: 输出已存在的 MySQL 目录
+      debug:
+        msg: "已存在的 MySQL 目录: {{ mysql_dirs.files | map(attribute='path') | join(', ') }}"
+      when: mysql_dirs.matched > 0    
+
+    - name:  解压文件 
+      unarchive:
+        src: /tmp/mysql.tar.gz
+        dest: /usr/local/
+        remote_src: yes
+      when: mysql_dirs.matched == 0
+
+    - name: 重命名mysql下载包
+      shell: mv /usr/local/mysql-5.7* /usr/local/mysql
+      args:
+        creates: /usr/local/mysql
+
+    - name: 创建mysql用户，设置为系统用户，设置根目录，设置无法登录
+      user:
+        name: mysql 
+        group: mysql
+        shell: /sbin/nologin 
+        system: yes 
+        home: /usr/local/mysql
+
+    - name: 修改mysql安装目录的权限
+      file:
+        path: /usr/local/mysql
+        mode: '0700'
+  
+    - name: 安装lib包
+      yum: name=libxcrypt-compat
+
+    - name: 配置my.cnf文件
+      copy:
+        content: |
+          [client]   
+          port=3306  
+          socket=/var/lib/mysql/mysql.sock 
+          [mysqld]
+          port=3306
+          basedir=/usr/local/mysql
+          datadir=/var/lib/mysql/data
+          pid-file=/var/lib/mysql/mysqld.pid
+          socket=/var/lib/mysql/mysql.sock
+          log_error=/var/lib/mysql/error.log
+          server-id=100
+
+        dest: /etc/my.cnf
+
+    - name: 新建文件夹并赋权给mysql用户
+      file:
+        path: /var/lib/mysql
+        state: directory
+        owner: mysql
+        group: mysql
+        mode: '0700'
+
+    - name: Initialize MySQL database
+      command: /usr/local/mysql/bin/mysqld --initialize --user=mysql
+      register: mysql_init
+      failed_when: "'error' in mysql_init.stderr.lower() or mysql_init.rc != 0"
+
+
+    - name: 配置mysqld.service
+      copy:
+        content: |
+          [Unit]
+          Description=MySQL Server
+          After=network.target
+
+          [Service]
+          User=mysql
+          Group=mysql
+          Type=forking
+          TimeoutSec=0
+          ExecStart=/usr/local/mysql/bin/mysqld --daemonize --pid-file=/var/lib/mysql/mysqld.pid $MYSQLD_OPTS 
+          EnvironmentFile=-/etc/sysconfig/mysql
+          LimitNOFILE = 5000
+          Restart=on-failure
+          RestartPreventExitStatus=1
+          Environment=MYSQLD_PARENT_PID=1
+          PrivateTmp=false
+
+          [Install] 
+          WantedBy=multi-user.target
+
+        dest: /usr/lib/systemd/system/mysqld.service
+
+
+
+
+    - name: Start and enable MySQL service
+      systemd:
+        name: mysqld
+        enabled: yes
+        state: started

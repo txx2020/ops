@@ -1,0 +1,11 @@
+---
+# 使用前提，hw111需要免密登录t12
+- name: Synchronize GitLab backup directory to target host
+  hosts: t12
+  tasks:
+    - name: Synchronization using rsync protocol (push to target host)
+      synchronize:
+        src: /home/tongtu/gitlab_backup_dir
+        dest: /home/tongtu/
+        mode: pull
+      delegate_to: wh111
