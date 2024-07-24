@@ -10,10 +10,13 @@ free -m |grep -vE 'total'   |awk '{ print "Disk Usage:"" " $1 " " $3"/"$2" ""("$
 
 # 最终修改版
 free -m | awk 'NR>=2{printf "%-4s  %-4.2f%s   \n", $1,$3*100/$2,"% "}';
+# 为了添加到playbook中，决定写个脚本，再次对命令进行优化,本次优化后取消了swap
+free -m  | grep -E 'Mem|内存' | awk '{printf "%-4s  %-4.2f%s   \n", $1,$3*100/$2,"% "}';
 
-df -h -t ext2 -t ext4 -t xfs |grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ printf "  %-4s    %-4s \n",$6 , $5}';
 
-top -n1 | grep load | awk '{printf "CPU Load: %.2f\n", $(NF-2)}';
+# 为了写入到文档中取消了第一行
+df -h -t ext2 -t ext4 -t xfs |grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ printf "  %-4s    %-4s \n",$6 , $5}' |grep  '/';
+top -bn1 | grep load | awk '{printf "CPU Load: %.2f\n", $(NF-2)}';
 
 
 
