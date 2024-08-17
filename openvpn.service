@@ -1,0 +1,19 @@
+##serivice  
+[Unit]
+Description=Openvpn Service
+After=network.target
+
+[Service]
+#Type=simple
+Type=forking
+ExecStart=/sbin/openvpn --daemon  --config /home/txx/etc/openvpn/txx.ovpn       
+ExecStartPost=/bin/sleep 10
+User=root
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+##selinux config
+# audit2allow -a -M myopenvpn
+# semodule -i myopenvpn.pp
