@@ -5,6 +5,8 @@
 # 中间会输入私钥和公钥
  docker-compose run --rm openvpn ovpn_getclient  weizhen  > ./weizhen.ovpn
 
+
+# docker-compose run --rm openvpn easyrsa build-client-full tianxiaoxiao   nopass # 无密码版
  # 更改端口，因为在容器内，所以不太一样
  sed -i 's/1194/49755/g' *ovpn
 
