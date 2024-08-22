@@ -10,3 +10,9 @@
 
 
 公钥：1uijsdkjijnkj*&*hh%^g
+
+# 撤销用户使用
+docker-compose run --rm openvpn easyrsa revoke weizhen
+
+# 所有流量全部走openvpn
+客户端添加：redirect-gateway autolocal
