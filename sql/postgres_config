@@ -1,0 +1,85 @@
+# 默认配置
+listen_addresses = '*'
+max_connections = 100			# (change requires restart)
+shared_buffers = 128MB			# min 128kB
+dynamic_shared_memory_type = posix	# the default is the first option
+max_wal_size = 1GB
+min_wal_size = 80MB
+log_timezone = 'Etc/UTC'
+datestyle = 'iso, mdy'
+timezone = 'Etc/UTC'
+lc_messages = 'en_US.utf8'			# locale for system error message
+lc_monetary = 'en_US.utf8'			# locale for monetary formatting
+lc_numeric = 'en_US.utf8'			# locale for number formatting
+lc_time = 'en_US.utf8'				# locale for time formatting
+default_text_search_config = 'pg_catalog.english'
+
+
+# 主数据库
+listen_addresses = '*'
+max_connections = 5000			# (change requires restart)
+shared_buffers = 128MB			# min 128kB
+dynamic_shared_memory_type = posix	# the default is the first option
+wal_level = replica			# minimal, replica, or logical
+max_wal_size = 1GB
+min_wal_size = 80MB
+archive_mode = on		# enables archiving; off, on, or always
+log_timezone = 'Etc/UTC'
+datestyle = 'iso, mdy'
+timezone = 'Etc/UTC'
+lc_messages = 'en_US.utf8'			# locale for system error message
+lc_monetary = 'en_US.utf8'			# locale for monetary formatting
+lc_numeric = 'en_US.utf8'			# locale for number formatting
+lc_time = 'en_US.utf8'				# locale for time formatting
+default_text_search_config = 'pg_catalog.english'
+
+# 从数据库
+listen_addresses = '*'
+max_connections = 5000			# (change requires restart)
+shared_buffers = 128MB			# min 128kB
+dynamic_shared_memory_type = posix	# the default is the first option
+wal_level = replica			# minimal, replica, or logical
+max_wal_size = 1GB
+min_wal_size = 80MB
+archive_mode = on		# enables archiving; off, on, or always
+recovery_target_timeline = 'latest'	# 'current', 'latest', or timeline ID
+primary_conninfo = 'host=42.64.34.132 port=5432 user=tongtu password=adminTTyj&*90UIop'
+hot_standby = on			# "off" disallows queries during recovery
+log_timezone = 'Etc/UTC'
+datestyle = 'iso, mdy'
+timezone = 'Etc/UTC'
+lc_messages = 'en_US.utf8'			# locale for system error message
+lc_monetary = 'en_US.utf8'			# locale for monetary formatting
+lc_numeric = 'en_US.utf8'			# locale for number formatting
+lc_time = 'en_US.utf8'				# locale for time formatting
+default_text_search_config = 'pg_catalog.english'
+
+
+# 大于64G内存优化
+listen_addresses = '*'
+wal_level= replica
+max_connections = 10240			# (change requires restart)
+shared_buffers = 16GB			# min 128kB
+dynamic_shared_memory_type = posix	# the default is the first option
+full_page_writes = on			# recover from partial page writes
+wal_log_hints = on			# also do full page writes of non-critical updates
+checkpoint_timeout = 20min		# range 30s-1d
+max_wal_size = 32GB
+min_wal_size = 8GB
+wal_keep_size = 10GB
+checkpoint_completion_target = 0.9	# checkpoint target duration, 0.0 - 1.0
+max_wal_senders = 10		# max number of walsender processes
+wal_keep_segments = 64		# in logfile segments; 0 disables
+wal_receiver_status_interval = 2s	# send replies at least this often
+log_destination = 'stderr'		# Valid values are combinations of
+logging_collector = on	# Enable capturing of stderr and csvlog
+log_directory = 'log'			# directory where log files are written,
+log_filename = 'postgresql-%a.log'	# log file name pattern,
+log_timezone = 'Etc/UTC'
+datestyle = 'iso, mdy'
+timezone = 'Etc/UTC'
+lc_messages = 'en_US.utf8'			# locale for system error message
+lc_monetary = 'en_US.utf8'			# locale for monetary formatting
+lc_numeric = 'en_US.utf8'			# locale for number formatting
+lc_time = 'en_US.utf8'				# locale for time formatting
+default_text_search_config = 'pg_catalog.english'

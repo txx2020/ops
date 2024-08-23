@@ -1,0 +1,8 @@
+1. zkServer.sh start
+2. hadoop-daemons.sh start journalnode
+3. hdfs namenode -format
+hdfs zkfc -formatZK
+start-all.sh
+
+hdfs namenode -bootstrapStandby
+hadoop-daemon.sh start namenode

@@ -18,3 +18,8 @@ docker-compose run --rm openvpn easyrsa revoke weizhen
 
 # 所有流量全部走openvpn
 客户端添加：redirect-gateway autolocal
+
+#hadoop下载文件
+./hdfs dfs -get  /hanyi/检测/1标段下部利旧图片   file:///home/tongtu/bak/hadoop/export
+#hadoop 上传文件
+./hdfs dfs -put file:///home/tongtu/server/export/1标段下部利旧图片   /hanyi/检测/
