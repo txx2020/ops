@@ -24,6 +24,9 @@ docker-compose run --rm openvpn easyrsa revoke weizhen
 #hadoop 上传文件
 ./hdfs dfs -put file:///home/tongtu/server/export/1标段下部利旧图片   /hanyi/检测/
 
+#hadoop删除文件
+./hdfs fs -rm -r
+
 #hbase导出表数据
 ./hbase org.apache.hadoop.hbase.mapreduce.Export emp file:///home/tongtu/bak
 
