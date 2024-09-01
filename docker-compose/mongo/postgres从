@@ -1,0 +1,34 @@
+# master
+CREATE ROLE tongtu login replication encrypted password 'adminTTyj&*90UIop';
+show archive_mode;
+
+# slave
+ docker exec -it 容器名字 /bin/bash
+ su - postgres
+  rm -rf /var/lib/postgresql/data/*
+	pg_basebackup -h 10.1.4.13 -p 5432 -U tongtu -Fp -Xs -Pv -R -D /var/lib/postgresql/data
+	
+	vi  standby.signal 
+	standby_mode = 'on'
+
+
+# 从数据库 postgres.conf
+listen_addresses = '*'
+max_connections = 5000      # (change requires restart)
+shared_buffers = 128MB      # min 128kB
+dynamic_shared_memory_type = posix   # the default is the first option
+wal_level = replica      # minimal, replica, or logical
+max_wal_size = 1GB
+min_wal_size = 80MB
+archive_mode = on    # enables archiving; off, on, or always
+recovery_target_timeline = 'latest'  # 'current', 'latest', or timeline ID
+primary_conninfo = 'host=10.1.4.13 port=5432 user=tongtu password=adminTTyj&*90UIop'
+hot_standby = on      # "off" disallows queries during recovery
+log_timezone = 'Etc/UTC'
+datestyle = 'iso, mdy'
+timezone = 'Etc/UTC'
+lc_messages = 'en_US.utf8'       # locale for system error message
+lc_monetary = 'en_US.utf8'       # locale for monetary formatting
+lc_numeric = 'en_US.utf8'      # locale for number formatting
+lc_time = 'en_US.utf8'        # locale for time formatting
+default_text_search_config = 'pg_catalog.english'

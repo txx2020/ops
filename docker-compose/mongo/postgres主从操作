@@ -1,0 +1,11 @@
+# master
+CREATE ROLE tongtu login replication encrypted password 'adminTTyj&*90UIop';
+show archive_mode;
+# slave
+ docker exec -it 容器名字 /bin/bash
+ su - postgres
+  rm -rf /var/lib/postgresql/data/*
+	pg_basebackup -h 10.1.4.13 -p 5432 -U tongtu -Fp -Xs -Pv -R -D /var/lib/postgresql/data
+	
+	vi  standby.signal 
+		

@@ -1,0 +1,20 @@
+# Master: creata copy user
+CREATE USER 'tongtu'@'%' IDENTIFIED BY 'adminTTyj&*90UIop';
+GRANT REPLICATION SLAVE ON *.* TO 'tongtu'@'%';
+FLUSH PRIVILEGES;
+# Master: record File and Positon ,stop operation database
+SHOW MASTER STATUS;
+
+# Slave: add master info
+CHANGE MASTER TO
+    MASTER_HOST='42.64.34.132',
+    MASTER_USER='tongtu',
+    MASTER_PASSWORD='adminTTyj&*90UIop',
+    MASTER_LOG_FILE='mysql-bin.000043',
+    MASTER_LOG_POS=1617;
+
+# Slave: start copy    # etc: before starting the Slave, delete the data/auto.cnf
+START SLAVE;
+
+# Slave: check Slave_IO_Running ans Slave_SQL_Running is "Yes"
+show slave status

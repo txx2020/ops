@@ -1,0 +1,214 @@
+version: '3'
+services:
+  configsvr1:
+    container_name: config
+    image: mongo:latest
+    command: mongod --configsvr --replSet config_rs --dbpath /data/db --port 27017
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/configsvr1:/data/db
+  shard1:
+    container_name: shard1
+    image: mongo:latest
+    command: mongod --replSet shard1_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1
+    ports:
+      - 27019:27017
+    volumes:
+      - ./data/shard1:/data/db
+  shard2:
+    container_name: shard2
+    image: mongo:latest
+    command: mongod --replSet shard2_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1
+    ports:
+      - 27020:27017
+    volumes:
+      - ./data/shard2:/data/db
+  shard3:
+    container_name: shard3
+    image: mongo:latest
+    command: mongod --replSet shard3_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1
+    ports:
+      - 27021:27017
+    volumes:
+      - ./data/shard3:/data/db
+  mongos:
+    container_name: mongos
+    image: mongo:latest
+    command: mongos --configdb config_rs/10.1.4.14:27018,10.1.4.16:27018,10.1.4.17:27018 --port 27017 --bind_ip_all
+    ports:
+      - 27017:27017
+    #volumes:
+    #  - ./data/key.file:/home/key.file
+
+
+# 配置 shard1 环境
+#在10.1.4.14执行   # configsvr1 10001:27018 shard1 20001:27019 shard2 20002:27020 shard3 :27021
+docker exec -it  shard1 mongosh
+#初始化
+ rs.initiate(
+       {
+         _id: "shard1_rs",
+         members: [
+           { _id : 0, host : "10.1.4.14:27019" },
+           { _id : 1, host : "10.1.4.16:27019" },
+           { _id : 2, host : "10.1.4.17:27019" }
+         ]
+       }
+     );
+#查看状态
+rs.status();
+#查看主节点
+db.isMaster();
+
+# 配置 Config Server 环境
+docker exec -it config  mongosh --port 27017
+
+  rs.initiate(
+   {
+     _id: "config_rs",
+     configsvr: true,
+     members: [
+       { _id : 0, host : "10.1.4.14:27018" },
+       { _id : 1, host : "10.1.4.16:27018" },
+       { _id : 2, host : "10.1.4.17:27018" }
+     ]
+   }
+ );
+
+# 测试是否成功 返回1为正常
+docker exec -it config mongosh --port 27017 --eval "db.runCommand({ ping: 1 })" | grep ok
+
+
+# Mongos 配置
+docker exec -it  mongos mongosh 
+
+sh.addShard("shard1_rs/10.1.4.14:27019,10.1.4.16:27019,10.1.4.17:27019")
+
+sh.status()
+
+# 功能测试
+
+#1.链接到mongos，创建分配集合
+docker exec -it mongos mongosh
+sh.status()
+#为了集合支持分片，需要先开启database的分片功能
+use graph;
+sh.enableSharding("graph")  ##开启  
+##对集合进行分片初始化
+sh.shardCollection("graph.emp",{_id: 'hashed'})
+
+sh.status()
+
+# 数据测试
+docker exec -it mongos mongosh
+##插入数据测试
+use graph
+for (var i = 0;i <=10;i++) 
+{
+   db.emp.insert({i:i});
+}
+##查询数据及分布情况
+db.emp.getShardDistribution()
+###查询数量
+db.emp.find().count()
+
+
+
+# 创建第二个分片，验证数据均衡
+docker exec -it shard2 mongosh 
+#初始化复制集shard2
+ rs.initiate(
+       {
+         _id: "shard2_rs",
+         members: [
+           { _id : 0, host : "10.1.4.14:27020" },
+           { _id : 1, host : "10.1.4.16:27020" },
+           { _id : 2, host : "10.1.4.17:27020" }
+         ]
+       }
+     );
+
+# 添加到mongos中
+docker exec -it  mongos mongosh 
+
+sh.addShard("shard2_rs/10.1.4.14:27020,10.1.4.16:27020,10.1.4.17:27020")
+
+sh.status()
+
+
+# 创建第三个分片，验证数据均衡
+docker exec -it shard3 mongosh 
+#初始化复制集shard3
+ rs.initiate(
+       {
+         _id: "shard3_rs",
+         members: [
+           { _id : 0, host : "10.1.4.14:27021" },
+           { _id : 1, host : "10.1.4.16:27021" },
+           { _id : 2, host : "10.1.4.17:27021" }
+         ]
+       }
+     );
+
+# 添加到mongos中
+docker exec -it  mongos mongosh 
+
+sh.addShard("shard3_rs/10.1.4.14:27021,10.1.4.16:27021,10.1.4.17:27021")
+
+sh.status()
+
+这里缺一段添加用户
+
+# 上面做完后添加密码
+
+version: '3'
+services:
+  configsvr1:
+    container_name: config
+    image: mongo:latest
+    command: mongod --configsvr --replSet config_rs --dbpath /data/db --port 27017 --keyFile /home/key.file 
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/configsvr1:/data/db
+      - ./data/key.file:/home/key.file
+
+  shard1:
+    container_name: shard1
+    image: mongo:latest
+    command: mongod --replSet shard1_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1 --keyFile /home/key.file 
+    ports:
+      - 27019:27017
+    volumes:
+      - ./data/shard1:/data/db
+      - ./data/key.file:/home/key.file
+
+  shard2:
+    container_name: shard2
+    image: mongo:latest
+    command: mongod --replSet shard2_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1 --keyFile /home/key.file 
+    ports:
+      - 27020:27017
+    volumes:
+      - ./data/shard2:/data/db
+      - ./data/key.file:/home/key.file
+
+  shard3:
+    container_name: shard3
+    image: mongo:latest
+    command: mongod --replSet shard3_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1 --keyFile /home/key.file 
+    ports:
+      - 27021:27017
+    volumes:
+      - ./data/shard3:/data/db
+      - ./data/key.file:/home/key.file
+
+  mongos:
+    container_name: mongos
+    image: mongo:latest
+    command: mongos --configdb config_rs/10.1.4.14:27018,10.1.4.16:27018,10.1.4.17:27018 --port 27017 --bind_ip_all --keyFile /home/key.file 
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/key.file:/home/key.file
