@@ -16,6 +16,9 @@
 # 撤销用户使用
 docker-compose run --rm openvpn easyrsa revoke weizhen
 
+sndbuf 0  #新增优化项
+rcvbuf 0   #新增优化项
+
 # 所有流量全部走openvpn
 客户端添加：redirect-gateway autolocal
 
