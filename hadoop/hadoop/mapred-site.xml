@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    <property>
+        <name>mapreduce.jobtracker.http.address</name>
+        <value>master1:50030</value>
+    </property>
+    <property>
+        <name>mapreduce.jobhistory.address</name>
+        <value>master1:10020</value>
+    </property>
+    <property>
+        <name>mapreduce.jobhistory.webapp.address</name>
+        <value>master1:19888</value>
+    </property>
+    <property>
+        <name>mapreduce.map.memory.mb</name>
+        <value>8192</value>
+        <!-- 8GB -->
+    </property>
+    <property>
+        <name>mapreduce.reduce.memory.mb</name>
+        <value>16384</value>
+        <!-- 16GB -->
+    </property>
+    <property>
+        <name>mapreduce.map.java.opts</name>
+        <value>-Xmx6144m</value>
+        <!-- Map任务的JVM堆内存 -->
+    </property>
+    <property>
+        <name>mapreduce.reduce.java.opts</name>
+        <value>-Xmx12288m</value>
+        <!-- Reduce任务的JVM堆内存 -->
+    </property>
+</configuration>

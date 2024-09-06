@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>hbase.master</name>
+        <value>master1:60000</value>
+    </property>
+    <property>
+        <name>hbase.master.maxclockskew</name>
+        <value>180000</value>
+    </property>
+    <property>
+        <name>hbase.tmp.dir</name>
+        <value>/data/data1/server/hbase-2.2.5/tmp</value>
+    </property>
+    <property>
+        <name>hbase.rootdir</name>
+        <value>hdfs://master1:9000/hbase</value>
+    </property>
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>master1,master2,slave1,slave2,slave3</value>
+    </property>
+    <property>
+        <name>hbase.hregion.memstore.flush.size</name>
+        <value>512000000</value>
+    </property>
+    <property>
+        <name>hbase.hregion.memstore.block.multiplier</name>
+        <value>4</value>
+    </property>
+    <property>
+        <name>hbase.zookeeper.property.dataDir</name>
+        <value>/data/data1/server/zookeeper-3.8.4</value>
+    </property>
+    <property>
+        <name>hbase.backup.master</name>
+        <value>master2</value>
+    </property>
+</configuration>

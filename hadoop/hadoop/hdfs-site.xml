@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <!-- 配置HDFS NameService -->
+    <property>
+        <name>dfs.nameservices</name>
+        <value>cluster1</value>
+    </property>
+    <!-- 配置NameNode高可用性 -->
+    <property>
+        <name>dfs.ha.namenodes.cluster1</name>
+        <value>master1,master2</value>
+    </property>
+    <property>
+        <name>dfs.namenode.rpc-address.cluster1.master1</name>
+        <value>master1:9000</value>
+    </property>
+    <property>
+        <name>dfs.namenode.rpc-address.cluster1.master2</name>
+        <value>master2:9000</value>
+    </property>
+    <property>
+        <name>dfs.namenode.http-address.cluster1.master1</name>
+        <value>master1:50070</value>
+    </property>
+    <property>
+        <name>dfs.namenode.http-address.cluster1.master2</name>
+        <value>master2:50070</value>
+    </property>
+    <property>
+        <name>dfs.client.failover.proxy.provider.cluster1</name>
+        <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+    </property>
+    <property>
+        <name>dfs.ha.automatic-failover.enabled</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>dfs.namenode.secondary.http-address</name>
+        <value>master2:50090</value>
+        <!-- master2为次节点的主机名或IP -->
+    </property>
+    <!-- 配置共享编辑目录 -->
+    <property>
+        <name>dfs.namenode.shared.edits.dir</name>
+        <value>qjournal://master1:8485;master2:8485/cluster1</value>
+    </property>
+    <!-- 配置JournalNode -->
+    <property>
+        <name>dfs.journalnode.edits.dir</name>
+        <value>/data/data1/server/hadoop-2.8.5/data/tmp/journal</value>
+    </property>
+    <property>
+        <name>dfs.journalnode.http-address</name>
+        <value>0.0.0.0:8480</value>
+    </property>
+    <property>
+        <name>dfs.journalnode.rpc-address</name>
+        <value>0.0.0.0:8485</value>
+    </property>
+    <!-- 配置数据和名称目录 -->
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>/data/data1/server/hadoop-2.8.5/data/dfs/name</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/data/data1/server/hadoop-2.8.5/data/dfs/data</value>
+    </property>
+    <!-- 配置副本数 -->
+    <property>
+        <name>dfs.replication</name>
+        <value>3</value>
+    </property>
+    <!-- 启用WebHDFS -->
+    <property>
+        <name>dfs.webhdfs.enabled</name>
+        <value>true</value>
+    </property>
+    <!-- 配置Zookeeper quorum -->
+    <property>
+        <name>ha.zookeeper.quorum</name>
+        <value>master1:2181,master2:2181,slave1:2181,slave2:2181,slave3:2181</value>
+    </property>
+    <!-- 配置SSH Fencing -->
+    <property>
+        <name>dfs.ha.fencing.methods</name>
+        <value>sshfence</value>
+    </property>
+    <property>
+        <name>dfs.ha.fencing.ssh.private-key-files</name>
+        <value>/home/tongtu/.ssh/id_rsa</value>
+    </property>
+</configuration>

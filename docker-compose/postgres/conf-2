@@ -4,12 +4,11 @@ show archive_mode;
 
 # slave
  docker exec -it 容器名字 /bin/bash
- su - postgres
-  rm -rf /var/lib/postgresql/data/*
-	pg_basebackup -h 10.1.4.13 -p 5432 -U tongtu -Fp -Xs -Pv -R -D /var/lib/postgresql/data
-	
-	vi  standby.signal 
-	standby_mode = 'on'
+  su - postgres
+   rm -rf /var/lib/postgresql/data/*
+   pg_basebackup -h 10.1.4.13 -p 5432 -U tongtu -Fp -Xs -Pv -R -D /var/lib/postgresql/data	
+ vi  standby.signal 
+  standby_mode = 'on'
 
 
 # 从数据库 postgres.conf

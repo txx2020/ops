@@ -1,0 +1,14 @@
+# 主从通用
+version: "3"
+services:
+  postgres:
+    container_name: tongtu_postgresql-1.0.2
+    image: tongtu-postgres:1.0.2
+    restart: unless-stopped
+    environment:
+         POSTGRES_PASSWORD: "ttyj7890ttyj"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime

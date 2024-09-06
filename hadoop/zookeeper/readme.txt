@@ -1,0 +1,1 @@
+所有机器设置一样的zoo.cfg,不一样的是data/myid

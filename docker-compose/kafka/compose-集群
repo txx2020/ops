@@ -1,0 +1,47 @@
+version: '3.0'
+services:
+  kafka1:
+    image: bitnami/kafka:3.0
+    hostname: kafka1
+    container_name: kafka1
+    environment:
+      ALLOW_PLAINTEXT_LISTENER: "yes"  # 允许使用明文协议
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka1:9093,OUTSIDE://kafka1:9092
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENER_NAME_PAIR: INSIDE,OUTSIDE
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE  # 添加此行以确保配置一致
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181,zookeeper4:2181,zookeeper5:2181
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - ./data:/var/lib/kafka/data
+    extra_hosts:
+      - "kafka1:10.1.4.14"
+      - "kafka2:10.1.4.16"
+      - "kafka3:10.1.4.17"
+      - "zookeeper1:10.1.4.16"
+      - "zookeeper2:10.1.4.17"
+      - "zookeeper3:10.1.4.18"
+      - "zookeeper4:10.1.4.19"
+      - "zookeeper5:10.1.4.20"
+  kafka-manager:
+    image: hlebalbau/kafka-manager:latest
+    container_name: kafka-manager
+    environment:
+      ZK_HOSTS: "zookeeper1:2181,zookeeper2:2181,zookeeper3:2181,zookeeper4:2181,zookeeper5:2181"
+      KM_KAFKA_MANAGER_PORT: "9000"
+      KM_ZK_HOSTS: "zookeeper1:2181,zookeeper2:2181,zookeeper3:2181,zookeeper4:2181,zookeeper5:2181"
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./manager-data:/kafka-manager/data
+    extra_hosts:
+      - "zookeeper1:10.1.4.16"
+      - "zookeeper2:10.1.4.17"
+      - "zookeeper3:10.1.4.18"
+      - "zookeeper4:10.1.4.19"
+      - "zookeeper5:10.1.4.20"

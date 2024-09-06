@@ -158,7 +158,14 @@ sh.addShard("shard3_rs/10.1.4.14:27021,10.1.4.16:27021,10.1.4.17:27021")
 
 sh.status()
 
-这里缺一段添加用户
+# 添加用户密码
+use admin 
+
+db.createUser({ user: "admin", pwd: "password", roles: [{ role: "userAdminAnyDatabase", db: "admin" }] })
+
+# 生成key.file
+
+openssl rand -base64 666 > ./key.file # 把生成的文件拷贝到所有机器
 
 # 上面做完后添加密码
 
@@ -212,3 +219,6 @@ services:
       - 27017:27017
     volumes:
       - ./data/key.file:/home/key.file
+
+
+# 后面再登录就需要密码了

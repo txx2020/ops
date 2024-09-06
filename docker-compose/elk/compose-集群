@@ -1,0 +1,103 @@
+version: "3"
+services:
+  #######################elasticsearch配置################
+  es01: # 其余节点需修改
+    image: elasticsearch:8.15.0
+    container_name: elk-cluster-es01
+    hostname: es01 # 其余节点需修改
+    restart: always
+    privileged: true
+    environment:
+      #节点名称
+      - node.name=es01 # 其余节点需修改
+      #集群名称
+      - cluster.name=elk-cluster-es
+      #其它节点
+      - discovery.seed_hosts=es01,es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - network.publish_host=es01 # 其余节点需修改
+      - network.host=0.0.0.0  # 监听所有网络接口
+      - bootstrap.memory_lock=true
+      #加入跨域配置
+      - http.cors.enabled=true
+      - http.cors.allow-origin="*"
+      #java堆内存大小设置
+      - "ES_JAVA_OPTS=-Xms4096m -Xmx4096m"
+      #开启读写权限
+      - "TAKE_FILE_OWNERSHIP=true"
+      # 禁用安全性功能（包括传输层SSL）
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    #数据卷映射
+    volumes:
+      - ./data:/usr/share/elasticsearch/data
+      - ./logs:/usr/share/elasticsearch/logs
+    #端口映射
+    ports:
+      - 9200:9200
+      - 9300:9300
+    extra_hosts:
+      - "es01:10.1.4.18"
+      - "es02:10.1.4.19"
+      - "es03:10.1.4.20"
+    #网络配置
+    networks:
+      - elk
+    
+  #####################kibana配置####################################
+  kibana:
+    image: kibana:8.15.0
+    container_name: elk-cluster-kibana
+    hostname: kibana
+    restart: always
+    environment:
+      #elasticsearch服务地址
+      ELASTICSEARCH_HOSTS: "http://10.1.4.18:9200"
+      #kibana语言配置：en、zh-CN、ja-JP
+      I18N_LOCALE: "zh-CN"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    #端口映射
+    ports:
+      - 5601:5601
+    extra_hosts:
+      - "es01:10.1.4.18"
+      - "es02:10.1.4.19"
+      - "es03:10.1.4.20"
+    networks:
+      - elk
+    # depends_on:
+    #   - es01
+    #   - es02
+    #   - es03
+
+  #####################logstash配置####################################
+  logstash01:
+    image: logstash:8.15.0
+    container_name: elk-cluster-logstash01
+    hostname: logstash01
+    restart: always
+    environment:
+      #elasticsearch服务地址
+      - elasticsearch=http://es01:9200,http://es02:9200,http://es03:9200
+    ports:
+      - 9600:9600
+      - 5044:5044
+    networks:
+      - elk
+    extra_hosts:
+      - "es01:10.1.4.18"
+      - "es02:10.1.4.19"
+      - "es03:10.1.4.20"
+    # depends_on:
+    #   - es01
+    #   - es02
+    #   - es03
+networks:
+  elk:
+    driver: bridge

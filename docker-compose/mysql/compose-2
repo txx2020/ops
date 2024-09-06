@@ -1,0 +1,24 @@
+# 从数据库
+version: "3"
+services:
+  mysql:
+    container_name: mysql-5.7.44
+    image: mysql:5.7.44-oraclelinux7
+    restart: unless-stopped
+    environment:
+         MYSQL_ROOT_PASSWORD: "admin123TTyj&*()UIOP"
+    volumes:
+      - ./data/:/var/lib/mysql
+      - /etc/localtime:/etc/localtime
+    ports:
+      - "3306:3306"
+    command:
+      --server_id=200
+      --log-bin=mysql-bin
+      --sync_binlog=1
+      --binlog-ignore-db=mysql
+      --binlog_format=row
+      --lower_case_table_names=1
+      --relay-log=relay-log
+      --read-only=1
+      --skip-slave-start
