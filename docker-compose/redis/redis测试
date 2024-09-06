@@ -1,0 +1,25 @@
+# 2024年8月，测试版本为6最新版本，redis安装包从官网下载，docker镜像从官网下载
+# 在40核128G电脑A上启动分别占用不同端口，经过测试docker版性能下降约15-20%
+
+# 1个长连接 
+./redis-benchmark -h 10.1.4.19 -p 6379 -c 1 -n 1000000 -t set -d 100 -q
+
+./redis-benchmark -h 10.1.4.19 -p 6380 -c 1 -n 1000000 -t set -d 100 -q
+
+# 5个长连接 
+./redis-benchmark -h 10.1.4.19 -p 6379 -c 5 -n 1000000 -t set -d 100 -q
+./redis-benchmark -h 10.1.4.19 -p 6380 -c 5 -n 1000000 -t set -d 100 -q
+
+# 10个长连接 
+./redis-benchmark -h 10.1.4.19 -p 6379 -c 10 -n 1000000 -t set -d 100 -q
+./redis-benchmark -h 10.1.4.19 -p 6380 -c 10 -n 1000000 -t set -d 100 -q
+
+# 50个长连接 
+./redis-benchmark -h 10.1.4.19 -p 6379 -c 50 -n 1000000 -t set -d 100 -q
+./redis-benchmark -h 10.1.4.19 -p 6380 -c 50 -n 1000000 -t set -d 100 -q
+
+# 10个长连接 
+./redis-benchmark -h 10.1.4.19 -p 6379 -c 10 -n 1000000 -t set -d 100 -q
+
+# 50个长连接 
+./redis-benchmark -h 10.1.4.19 -p 6379 -c 50 -n 1000000 -t set -d 100 -q
