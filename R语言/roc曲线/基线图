@@ -17,7 +17,7 @@ age_mean <- round(mean(data$入院年龄, na.rm = TRUE), 2)
 age_sd <- round(sd(data$入院年龄, na.rm = TRUE), 2)
 # 打印标准差
 cat("入院年龄的均数 ± 标准差: ", age_mean, " ± ", age_sd, "\n")
- 
+
 
 # 将年龄分段，例如分为<60, 60-74, >=75
 data$年龄分段 <- cut(data$入院年龄, 
@@ -129,12 +129,12 @@ ggplot(data, aes(x = INR)) +
   labs(title = 'INR分布直方图', x = 'INR', y = '频数') +
   theme_minimal()
 
-# 计算百分比消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9
-aa_percent <- prop.table(table(data$"消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9")) * 100
+# 计算百分比病因分类（消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9）
+aa_percent <- prop.table(table(data$"病因分类（消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9）")) * 100
 # 将百分比添加回原数据框
 aa_percent_df <- as.data.frame(aa_percent)
 
-data$aa_percent <- sapply(data$"消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9", function(x) aa_percent_df$Percent[aa_percent_df$Value == x])
+data$aa_percent <- sapply(data$"病因分类（消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9）", function(x) aa_percent_df$Percent[aa_percent_df$Value == x])
 
 
 
@@ -157,8 +157,7 @@ table_df <- cbind(Variable = rownames(table_df), table_df)
 rownames(table_df) <- NULL
 
 
-write_xlsx(table_df, "D:\\tmp\\描述性统计表.xlsx")
-
+write_xlsx(table_df, "D:\\test\\描述性统计表.xlsx")
 
 
 
