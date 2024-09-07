@@ -137,7 +137,10 @@ aa_percent_df <- as.data.frame(aa_percent)
 data$aa_percent <- sapply(data$"病因分类（消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9）", function(x) aa_percent_df$Percent[aa_percent_df$Value == x])
 
 
-
+data$性别 <- as.factor(data$性别)
+data$年龄分段 <- as.factor(data$年龄分段)
+data$休克分段 <- as.factor(data$休克分段)
+data$血红蛋白分段 <- as.factor(data$血红蛋白分段)
 
 
 # 创建描述性统计表，包括性别和年龄分段
