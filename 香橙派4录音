@@ -1,0 +1,7 @@
+amixer cset name="RECMIXL INL1 Switch" on;
+amixer cset name="RECMIXL BST2 Switch" on;
+amixer cset name="RECMIXR INR1 Switch" on;
+amixer cset name="RECMIXR BST2 Switch" on;
+amixer cset name="RECMIXL BST3 Switch" off;
+amixer cset name="RECMIXR BST3 Switch" off;
+arecord -D hw:0,0 -d 5 -f cd -t wav test.wav
