@@ -1,0 +1,164 @@
+library(tableone)
+library(readxl)
+#install.packages('ggplot2')
+# 读取Excel数据
+data <- read_xlsx("D:\\test\\roc_line.xlsx", sheet = 5)
+names(data)
+
+
+# 检查“入院年龄”列的类型
+str(data$入院年龄)
+
+# 将“入院年龄”列转换为数值类型，如果需要的话
+data$入院年龄 <- as.numeric(data$入院年龄)
+
+# 计算入院年龄的均数和标准差
+age_mean <- round(mean(data$入院年龄, na.rm = TRUE), 2)
+age_sd <- round(sd(data$入院年龄, na.rm = TRUE), 2)
+# 打印标准差
+cat("入院年龄的均数 ± 标准差: ", age_mean, " ± ", age_sd, "\n")
+ 
+
+# 将年龄分段，例如分为<60, 60-74, >=75
+data$年龄分段 <- cut(data$入院年龄, 
+                 breaks = c(-Inf, 59, 74, Inf),
+                 labels = c("<60", "60-74", "75+"))
+
+# 查看数据结构以确认分段是否正确
+str(data)
+
+# 住院天数直方图
+library(ggplot2)
+# 绘制直方图
+# 检查“住院天数”列的类型
+str(data$住院天数)
+# 将“住院天数”列转换为数值类型，如果需要的话
+data$住院天数 <- as.numeric(data$住院天数)
+ggplot(data, aes(x = 住院天数)) +
+  geom_histogram(binwidth = 1, fill = 'blue', color = 'black', alpha = 0.7) +
+  labs(title = '住院天数分布直方图', x = '住院天数', y = '频数') +
+  theme_minimal()
+# 进行Shapiro-Wilk正态性检验
+shapiro.test(data$住院天数)
+
+
+# 收缩压直方图
+str(data$入院时收缩压mmHg)
+data$入院时收缩压mmHg <- as.numeric(data$入院时收缩压mmHg)
+ggplot(data, aes(x = 入院时收缩压mmHg)) +
+  geom_histogram(binwidth = 1, fill = 'blue', color = 'black', alpha = 0.7) +
+  labs(title = '入院时收缩压mmHg分布直方图', x = '入院时收缩压mmHg', y = '频数') +
+  theme_minimal()
+
+# 舒张压
+str(data$入院时舒张压)
+data$入院时舒张压 <- as.numeric(data$入院时舒张压)
+
+# 入院心率（次/分）
+str(data$"入院心率（次/分）")
+data$"入院心率（次/分）" <- as.numeric(data$"入院心率（次/分）")
+
+
+# 休克指数分段
+str(data$"休克指数")
+
+# 休克指数分段
+data$休克指数 <- as.numeric(data$休克指数)
+data$休克分段 <- cut(data$休克指数, 
+                 breaks = c(-Inf, 0.4999999999999999999999, 0.9999999999999999999999,1.9999999999999999999999,Inf),
+                 labels = c("<0.5", "0.5-1.0","1.0-2.0", "2+"))
+
+
+# 血红蛋白
+str(data$血红蛋白)
+data$血红蛋白 <- as.numeric(data$血红蛋白)
+# 血红蛋白分段
+data$血红蛋白 <- as.numeric(data$血红蛋白)
+data$血红蛋白分段 <- cut(data$血红蛋白, 
+                   breaks = c(-Inf, 29, 59,90,Inf),
+                   labels = c("<30", "30-60","60-90", "90+"))
+
+
+# 白蛋白直方图
+str(data$白蛋白)
+data$白蛋白 <- as.numeric(data$白蛋白)
+ggplot(data, aes(x = 白蛋白)) +
+  geom_histogram(binwidth = 1, fill = 'blue', color = 'black', alpha = 0.7) +
+  labs(title = '白蛋白分布直方图', x = '白蛋白', y = '频数') +
+  theme_minimal()
+
+
+
+# 血尿素氮直方图
+str(data$尿素氮)
+data$尿素氮 <- as.numeric(data$尿素氮)
+ggplot(data, aes(x = 尿素氮)) +
+  geom_histogram(binwidth = 1, fill = 'blue', color = 'black', alpha = 0.7) +
+  labs(title = '尿素氮分布直方图', x = '尿素氮', y = '频数') +
+  theme_minimal()
+
+
+# 血肌酐直方图
+str(data$肌酐)
+data$肌酐 <- as.numeric(data$肌酐)
+ggplot(data, aes(x = 肌酐)) +
+  geom_histogram(binwidth = 1, fill = 'blue', color = 'black', alpha = 0.7) +
+  labs(title = '肌酐分布直方图', x = '肌酐', y = '频数') +
+  theme_minimal()
+
+# 修改错误数据
+data$肌酐
+# 找到 肌酐 列中 NA 值的位置
+na_rows <- which(is.na(data$肌酐))
+# 将 NA 值修改为 58.9
+data$肌酐[na_rows] <- 58.9
+
+rows <- which(data$血红蛋白 == 0.94)
+data$血红蛋白[rows] <- 55
+data$INR[rows] <- 0.94
+
+rows <- which(data$"有无黑便（有=1，无=0）" == 2)
+data$"有无黑便（有=1，无=0）"[rows] <- 1
+
+
+# INR直方图
+str(data$INR)
+data$INR <- as.numeric(data$INR)
+ggplot(data, aes(x = INR)) +
+  geom_histogram(binwidth = 1, fill = 'blue', color = 'black', alpha = 0.7) +
+  labs(title = 'INR分布直方图', x = 'INR', y = '频数') +
+  theme_minimal()
+
+# 计算百分比消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9
+aa_percent <- prop.table(table(data$"消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9")) * 100
+# 将百分比添加回原数据框
+aa_percent_df <- as.data.frame(aa_percent)
+
+data$aa_percent <- sapply(data$"消化道溃疡=1，静脉曲张=2，食管炎=3，胃十二指肠肿瘤=4，胃炎和十二指肠炎=5，贲门撕裂综合征=6，动脉血管畸形=7，其他原因=8，原因不明=9", function(x) aa_percent_df$Percent[aa_percent_df$Value == x])
+
+
+
+
+
+# 创建描述性统计表，包括性别和年龄分段
+table <- CreateTableOne(vars = c("性别", "年龄分段", "入院年龄","住院天数","入院时收缩压mmHg","入院时舒张压","入院心率（次/分）","休克分段","血红蛋白","血红蛋白分段","白蛋白","尿素氮","肌酐","INR","有无呕血（有=1，无=0）","有无黑便（有=1，无=0）","有无休克（有=1，无=0）","有无晕厥（有=1，无=0）","意识状态改变GCS<15分（有=1，无=0）","肾功能不全（有=1，无=0）","肝脏疾病（有=1，无=0）","肝功能不全（有=1，无=0）","心衰（有=1，无=0）","高血压（有=1，无=0）","糖尿病（有=1，无=0）","脑卒中（有=1，无=0）","房颤（有=1，无=0）","肝硬化（有=1，无=0）","肿瘤病史（胃肠道肿瘤=1，其他肿瘤=2，无肿瘤=0）","肿瘤转移（有=1，无=0）","口服非甾体抗炎药物","口服抗凝药物","心梗病史","幽门螺旋杆菌","乙肝","痛风/高尿酸","内镜检查有=1，无=0","介入手术","外科手术","输血","院内感染","抗生素使用（有=1，无=0）","气管插管（有=1，无=0）","中心静脉穿刺","既往上血病史（有=1，无=0）"), data = data)
+
+# 打印表格，并设置格式保留两位小数
+print(table, quote = FALSE, noSpaces = TRUE, printToggle = TRUE, varLabels = TRUE, smd = TRUE, contDigits = 2, catDigits = 2)
+
+print_table <- print(table, quote = FALSE, noSpaces = TRUE, printToggle = TRUE, varLabels = TRUE, smd = TRUE, contDigits = 2, catDigits = 2)
+
+# 将table转换为数据框
+
+library(writexl)
+# 将数据框导出为Excel文件
+table_df <- as.data.frame(print_table)
+table_df <- cbind(Variable = rownames(table_df), table_df)
+rownames(table_df) <- NULL
+
+
+write_xlsx(table_df, "D:\\tmp\\描述性统计表.xlsx")
+
+
+
+
