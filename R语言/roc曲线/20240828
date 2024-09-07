@@ -6,7 +6,7 @@ library(readxl)
 rm(data)
 
 # 从Excel文件中读取数据
-data <- read_xlsx("D:\\test\\roc_line.xlsx", sheet = 1)
+data <- read_xlsx("D:\\test\\roc_line.xlsx", sheet = 5)
 
 # 去除列名中的 '...' 及后续字符
 names(data) <- gsub("\\.\\.\\..*", "", names(data))
@@ -15,7 +15,6 @@ names(data) <- gsub("\\.\\.\\..*", "", names(data))
 print(names(data))
 
 # 确保评分列为数值型
-scores <- c("AIMS65评分", "PRS评分", "GBS评分", "ABC评分", "Rockall评分")
 
 scores <- c("AIMS65评分", "PRS评分", "GBS评分", "ABC评分", "Rockall评分","mGBS评分","JBS评分")
 		
@@ -27,10 +26,10 @@ for (score in scores) {
 }
 
 # 定义分析点和评分的列名
-outcomes <- c("有无出院后再出血", "有无死亡", "院内再出血", "院内死亡（死亡=1，无死亡=0）", "介入手术", "外科手术", "输血", "院内感染"
-              , "抗生素使用（有=1，无=0）", "气管插管（有=1，无=0）","出院30天内死亡","出院60天内死亡","出院90天内死亡",	"出院120天内死亡",	
-              "出院180天内死亡",	"出院1年内死亡"
-)
+outcomes <- c("有无出院后再出血", "有无死亡", "院内再出血", "院内死亡（死亡=1，无死亡=0）", "介入手术", "外科手术", "输血", "院内感染", 
+              "抗生素使用（有=1，无=0）", "气管插管（有=1，无=0）","出院30天内死亡","出院60天内死亡","出院90天内死亡",	"出院120天内死亡",	
+              "出院180天内死亡",	"出院1年内死亡")
+
 
 # 单独绘制每个分析点下的5个评分的ROC曲线
 draw_roc_combined <- function(outcome) {
@@ -146,10 +145,3 @@ for (outcome in outcomes) {
   # 序号递增
   file_index <- file_index + 1
 }
-
-
-
-
-
-
-
