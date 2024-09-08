@@ -3,6 +3,7 @@ library(readxl)
 library(compareGroups)
 
 rm(data)
+# excel 需要调整，把0、1变量调整成汉字，手动在表内修改即可
 data <- read_xlsx("D:\\test\\roc_line.xlsx", sheet = 5)
 names(data)
 
