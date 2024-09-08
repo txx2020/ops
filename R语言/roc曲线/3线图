@@ -1,0 +1,33 @@
+library(tableone)
+library(readxl) 
+library(compareGroups)
+
+rm(data)
+data <- read_xlsx("D:\\test\\roc_line.xlsx", sheet = 5)
+names(data)
+
+
+#data$性别 <- factor(data$性别, levels = c(2, 1), labels = c("女", "男"))
+
+data$入院年龄 <- cut(data$入院年龄, breaks = c(-Inf, 59, 74, Inf),labels = c("<60", "60-74", "75+"))
+
+#	伴发疾病评分
+
+
+data$预后不良 <- factor(data$预后不良, levels = c(0, 1), labels = c("预后良好", "预后不良"))
+
+data$休克指数 <- cut(data$休克指数, breaks = c(-Inf, 0.4999999999999999999999, 0.9999999999999999999999,1.9999999999999999999999,Inf),labels = c("<0.5", "0.5-1.0","1.0-2.0", "2+"))
+data$血红蛋白 <- cut(data$血红蛋白,breaks = c(-Inf, 29, 59,90,Inf),labels = c("<30", "30-60","60-90", "90+"))
+
+
+
+  summary(data)
+#install.packages("descr")
+library(descr)
+
+rm(tab1)
+tab1 <- descrTable (预后不良 ~ .,data  = data)
+# 调整成0.05
+## tab1$P <- ifelse(tab1$P < 0.05, "<0.05", format(tab1$P, digits = 3))
+
+export2word(tab1,file='D:\\test\\快速三线表_0.05.docx')

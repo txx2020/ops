@@ -108,14 +108,14 @@ ggplot(data, aes(x = 肌酐)) +
 
 # 修改错误数据
 data$肌酐
-# 找到 肌酐 列中 NA 值的位置
-na_rows <- which(is.na(data$肌酐))
-# 将 NA 值修改为 58.9
-data$肌酐[na_rows] <- 58.9
+# # 找到 肌酐 列中 NA 值的位置
+# na_rows <- which(is.na(data$肌酐))
+# # 将 NA 值修改为 58.9
+# data$肌酐[na_rows] <- 58.9
 
-rows <- which(data$血红蛋白 == 0.94)
-data$血红蛋白[rows] <- 55
-data$INR[rows] <- 0.94
+# rows <- which(data$血红蛋白 == 0.94)
+# data$血红蛋白[rows] <- 55
+# data$INR[rows] <- 0.94
 
 rows <- which(data$"有无黑便（有=1，无=0）" == 2)
 data$"有无黑便（有=1，无=0）"[rows] <- 1
