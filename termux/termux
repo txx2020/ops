@@ -1,0 +1,8 @@
+# 停止充电
+echo '0'> /sys/class/power_supply/battery/battery_charging_enabled
+
+# 开启充电
+echo '1'> /sys/class/power_supply/battery/battery_charging_enabled
+
+# 查看电量剩余、温度
+termux-battery-status
