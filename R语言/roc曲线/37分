@@ -1,0 +1,18 @@
+library(readxl)
+library(writexl)
+
+# 读取数据
+data <- read_xlsx("D:\\test\\roc_line.xlsx", sheet = 2)
+
+# 设置种子以确保结果可重复
+set.seed(123)
+
+# 随机抽取70%的数据
+train_data <- data %>% sample_frac(0.7)
+
+# 剩余的30%数据
+test_data <- anti_join(data, train_data)
+
+# 将结果保存到 Excel 文件
+write_xlsx(train_data, path = 'D:\\test\\train_data_70.xlsx')
+write_xlsx(test_data, path = 'D:\\test\\test_data_30.xlsx')
