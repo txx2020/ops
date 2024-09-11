@@ -1,8 +1,8 @@
 library(readxl)
 library(writexl)
-
+library(dplyr)
 # 读取数据
-data <- read_xlsx("D:\\test\\roc_line.xlsx", sheet = 2)
+data <- read_xlsx("D:\\test\\37.xlsx", sheet = 1)
 
 # 设置种子以确保结果可重复
 set.seed(123)
@@ -14,5 +14,5 @@ train_data <- data %>% sample_frac(0.7)
 test_data <- anti_join(data, train_data)
 
 # 将结果保存到 Excel 文件
-write_xlsx(train_data, path = 'D:\\test\\train_data_70.xlsx')
-write_xlsx(test_data, path = 'D:\\test\\test_data_30.xlsx')
+write_xlsx(train_data, path = 'D:\\test\\70.xlsx')
+write_xlsx(test_data, path = 'D:\\test\\30.xlsx')
