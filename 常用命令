@@ -22,7 +22,7 @@ docker-compose run --rm openvpn ovpn_initpki
 
 # 撤销用户使用
 docker-compose run --rm openvpn easyrsa revoke weizhen
-
+sed -i '/<\/tls-auth>/a sndbuf 0\nrcvbuf 0'  /usr/local/bin/ovpn_getclient
 sndbuf 0  #新增优化项
 rcvbuf 0   #新增优化项
 
