@@ -1,0 +1,37 @@
+library(pROC)
+library(tableone)
+library(readxl)
+
+# 删除已存在的 data 对象
+rm(data)
+
+# 从Excel文件中读取数据
+data <- read_xlsx("D:\\test\\30队列.xlsx", sheet = 2)
+
+
+# 确保评分列为数值型
+mod<-glm(预后不良~有无呕血+意识状态改变+肾功能不全+白蛋白降低+INR延长,family="binomial",data = data)
+summary(mod)
+
+pre<-predict(mod,type="response",newdata=data)
+ROC <- roc(data$预后不良,pre)
+plot(ROC)
+ROC$auc
+ci(ROC)
+
+# 计算线性组合
+data$linear_pred <- -3.416 + 0.806 * data$有无呕血 + 1.167 * data$意识状态改变 +
+  0.694 * data$肾功能不全 + 0.959 * data$白蛋白降低 +
+  0.922 * data$INR延长
+
+# 计算预测概率 (logit function)
+data$predicted_prob <- 1 / (1 + exp(-data$linear_pred))
+
+# 输出预测结果
+head(data$predicted_prob)
+
+
+roc_curve <- roc(data$预后不良, data$predicted_prob)
+
+# 绘制 ROC 曲线图
+plot(roc_curve, print.auc = TRUE, col = "blue")
