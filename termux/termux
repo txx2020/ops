@@ -6,3 +6,8 @@ echo '1'> /sys/class/power_supply/battery/battery_charging_enabled
 
 # 查看电量剩余、温度
 termux-battery-status
+
+# scrcpy-noconsole 无线连接
+adb  tcpip 5555
+
+adb  connect 192.168.1.166
