@@ -1,0 +1,147 @@
+library(pROC)
+library(tableone)
+library(readxl)
+
+# 删除已存在的 data 对象
+rm(data)
+
+# 从Excel文件中读取数据
+ data <- read_xlsx("D:\\test\\验证队列.xlsx", sheet = 3)
+#data <- read_xlsx("D:\\test\\70.xlsx", sheet = 3)
+
+# 确保评分列为数值型
+mod<-glm(预后不良~有无呕血+意识状态改变+肾功能不全+白蛋白降低+INR延长,family="binomial",data = data)
+summary(mod)
+
+pre<-predict(mod,type="response",newdata=data)
+ROC <- roc(data$预后不良,pre)
+plot(ROC)
+ ROC$auc
+  ci(ROC)
+
+# 计算线性组合
+data$linear_pred <- -3.377 + 0.806 * data$有无呕血 + 1.152 * data$意识状态改变 +
+  0.712 * data$肾功能不全 + 0.973 * data$白蛋白降低 +
+  0.899 * data$INR延长
+
+# 计算预测概率 (logit function)
+data$predicted_prob <- 1 / (1 + exp(-data$linear_pred))
+
+# 输出预测结果
+head(data$predicted_prob)
+
+
+roc_curve <- roc(data$预后不良, data$predicted_prob)
+# 显示小数点后7位
+auc_value <- format(roc_curve$auc, nsmall = 7)
+cat("AUC值:", auc_value, "\n")
+# 绘制 ROC 曲线图
+plot(roc_curve, print.auc = TRUE, col = "blue")
+roc_curve$auc
+ci(roc_curve)
+
+# 30验证集： AUC值: 0.7909159 
+# 70训练集： AUC值: 0.7909900 
+
+
+ 
+library(rms)
+
+# 创建数据集
+dd <- datadist(data)
+options(datadist = "dd")
+
+# 构建列线图
+model <- lrm(预后不良 ~ 有无呕血 + 意识状态改变 + 肾功能不全 + 白蛋白降低 + INR延长, data = data)
+
+# 绘制列线图
+nom <- nomogram(model, fun=list(function(x) 1/(1+exp(-x))), funlabel="预后概率")
+plot(nom)
+#install.packages('ResourceSelection')
+
+
+
+
+
+
+
+
+
+
+
+
+library(rms)
+library(ResourceSelection)
+
+# 创建数据集
+dd <- datadist(data)
+options(datadist = "dd")
+
+# 构建逻辑回归模型，确保x=TRUE和y=TRUE
+model <- lrm(预后不良 ~ 有无呕血 + 意识状态改变 + 肾功能不全 + 白蛋白降低 + INR延长, data = data, x = TRUE, y = TRUE)
+
+# 计算预测概率
+predicted_probs <- predict(model, type = "fitted")
+
+# Hosmer-Lemeshow拟合优度检验
+hl_test <- hoslem.test(data$预后不良, predicted_probs, g = 10)  # 将数据分为10组
+print(hl_test)
+
+# 校准曲线绘制
+calibration_data <- calibrate(model, method = "boot", B = 1000)  # 进行bootstrap校准
+plot(calibration_data, main = "校准曲线")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+library(rms)
+library(ResourceSelection)
+library(ggplot2)
+
+# 创建数据集
+dd <- datadist(data)
+options(datadist = "dd")
+
+# 构建逻辑回归模型，确保x=TRUE和y=TRUE
+model <- lrm(预后不良 ~ 有无呕血 + 意识状态改变 + 肾功能不全 + 白蛋白降低 + INR延长, data = data, x = TRUE, y = TRUE)
+
+# 计算预测概率
+predicted_probs <- predict(model, type = "fitted")
+
+# Hosmer-Lemeshow拟合优度检验
+hl_test <- hoslem.test(data$预后不良, predicted_probs, g = 10)  # 将数据分为10组
+print(hl_test)
+
+# 计算每组的实际和预测概率
+calibration_data <- data.frame(
+  observed = as.numeric(data$预后不良),
+  predicted = predicted_probs
+)
+
+# 计算校准曲线的散点图数据
+calibration_summary <- aggregate(predicted ~ observed, data = calibration_data, FUN = mean)
+
+# 绘制散点图
+ggplot(calibration_summary, aes(x = observed, y = predicted)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "校准曲线散点图", x = "实际事件率", y = "预测概率") +
+  theme_minimal()
+
+
+
+
+
+
+
+
