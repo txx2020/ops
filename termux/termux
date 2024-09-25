@@ -11,3 +11,5 @@ termux-battery-status
 adb  tcpip 5555
 
 adb  connect 192.168.1.166
+# termux 无线调试方法
+https://blog.csdn.net/shawnkong/article/details/8923933#:~:text=Android%20%E7%BD%91%E7%BB%9C%E8%B0%83%E8%AF%95%20adb%20tcpip%20%E5%BC%80%E5%90%AF%E6%96%B9%E6%B3%95%201%20adb%20tcpip,%20192.168.1.199%20%20%EF%BC%88Android%E8%AE%BE%E5%A4%87IP%E5%9C%B0%E5%9D%80%EF%BC%89%203%20adb%20usb%20%E4%BD%BF%E7%94%A8%E5%9B%9Eusb%E8%B0%83%E8%AF%95
