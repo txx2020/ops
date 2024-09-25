@@ -1,0 +1,110 @@
+#载入数据
+library(readxl)
+
+# 从Excel文件中读取数据
+data <- read_xlsx("D:\\test\\验证队列.xlsx", sheet = 3)
+#data <- read_xlsx("D:\\test\\70.xlsx", sheet = 3)
+
+data<-as.data.frame(data)
+#建立模型公式
+form.bestglm<-as.formula(预后不良~有无呕血+意识状态改变+肾功能不全+白蛋白降低+INR延长)
+form.all<-as.formula(预后不良~.)
+
+#打包，# 创建数据集
+library(rms)
+dd=datadist(data)
+options(datadist="dd")
+
+#建立logistic模型，确保x=TRUE和y=TRUE
+fit.glm<- lrm(预后不良~有无呕血+意识状态改变+肾功能不全+白蛋白降低+INR延长, data = data, x = TRUE, y = TRUE) 
+
+
+# 进行校准曲线拟合 ,method设置抽样的方法为bootstrap，B设置bootstrap的次数为1000。
+cal.glm<-calibrate(fit.glm,method = "boot",B=1000)
+
+# 绘制校准曲线
+
+par(mar=c(5,5,2,1))
+plot(cal.glm,main = "校准曲线")
+
+# 下面是五彩斑斓，但是不想要，如果想要五彩斑斓，把main = "校准曲线") 注释掉
+#     xlim = c(0,1), # 尺子标度
+#     ylim = c(0,1), # 尺子标度
+#     xlab = "Predicted Probability",
+#     ylab="Observed  Probability",
+#     xaxs = "i",
+#     yaxs = "i",
+#     legend =FALSE,
+#     subtitles = FALSE,#不显示副标题
+#     cex=1.5,
+#     cex.axis=1.5,
+#     cex.lab=1.5)
+#abline(0,1,col="blue",lty=2,lwd=2) #绘制参考线
+##调用cal.glm中的“calibrated.orig",即未校正的曲线，设置为实线，红色
+#lines(cal.glm[,c("predy","calibrated.orig")],type="l",lwd=2,col="red")
+##调用cal.glm中的"calibrated.corrected",即校准的曲线，实线绿色
+#lines(cal.glm[,c("predy","calibrated.corrected")],type="l",lwd=2,col="green")
+#legend(x=0.55,y=0.35,
+#       legend=c("Ideal","Apparent","Bias-corrected"),
+#       lty = c(2,1,1),
+#       lwd = c(2,1,1),
+#       col = c("blue","red","green"),
+#       bty="n",
+#       cex=1.5)
+
+
+# 拟合logistic模型
+#install.packages("riskRegression")
+library(riskRegression)
+
+fit.glm = glm(formula=form.bestglm,data=data,family=binomial())
+
+
+# 进行校准曲线拟合（跟ROC一样）
+xb <-Score(object=list(fit.glm),
+           
+           formula=预后不良~1,
+           
+           plots=c("calibration","ROC"),
+           
+           metrics = c("auc", "brier"),
+           
+           B=1000,M=50,
+           
+           data=data)
+
+
+#绘制校准曲线：
+plotCalibration(x=xb,
+                
+                xlab="Predictd Risk",
+                
+                ylab = "Observed Frequency",
+                
+                col="black",
+                
+                brier.in.legend=FALSE,
+                
+                auc.in.legend=FALSE)
+
+
+# 对X轴进行分段处理，绘制频率图 ，无法执行
+plotCalibration(x=xb,
+                
+                ylab = "Frequency",
+                
+                bars=TRUE,
+                
+                q=7,
+                
+                show.frequencies=TRUE)
+
+# B．val.prob（）函数
+fit.glm = glm(formula=form.bestglm,data=data,family=binomial())
+
+pred.logit<-predict(fit.glm)
+
+phat <- 1/(1+exp(-pred.logit))
+
+# 绘制校准曲线
+val.prob(p=phat,y=data$预后不良,m=150,cex=1)
