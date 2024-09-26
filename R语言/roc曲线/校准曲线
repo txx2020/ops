@@ -75,29 +75,29 @@ xb <-Score(object=list(fit.glm),
 
 
 #绘制校准曲线：
-plotCalibration(x=xb,
+# plotCalibration(x=xb,
                 
-                xlab="Predictd Risk",
+#                xlab="Predictd Risk",
                 
-                ylab = "Observed Frequency",
+#                ylab = "Observed Frequency",
                 
-                col="black",
+#                col="black",
                 
-                brier.in.legend=FALSE,
+#                brier.in.legend=FALSE,
                 
-                auc.in.legend=FALSE)
+#                auc.in.legend=FALSE)
 
 
 # 对X轴进行分段处理，绘制频率图 ，无法执行
-plotCalibration(x=xb,
+#plotCalibration(x=xb,
                 
-                ylab = "Frequency",
+#                ylab = "Frequency",
                 
-                bars=TRUE,
+#                bars=TRUE,
                 
-                q=7,
+#                q=7,
                 
-                show.frequencies=TRUE)
+#                show.frequencies=TRUE)
 
 # B．val.prob（）函数
 fit.glm = glm(formula=form.bestglm,data=data,family=binomial())
