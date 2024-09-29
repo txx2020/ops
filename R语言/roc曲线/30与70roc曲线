@@ -113,8 +113,15 @@ plot(0, 0, type = "n", xlab = "False Positive Rate (1 - Specificity)",
 lines(1 - roc_obj$specificities, roc_obj$sensitivities, col = "blue", lwd = 2)
 text(0.5, 0.3, paste("AUC (训练集):", sprintf("%.3f",auc_value1)), pos = 4)
 
+#####
+#不用上面的画图
+####
 
-
+text(0.5, 0.4, paste("AUC:", round(auc_value1,  3)), pos = 4)
+text(0.5, 0.35, paste("Best Cutoff:", round(best_cutoff1,3)), pos = 4)
+text(0.5, 0.3, paste("Sensitivity:", round(sensitivity1, 3)), pos = 4)
+text(0.5, 0.25, paste("Specificity:", round(specificity1, 3)), pos = 4)
+text(0.5, 0.2, paste("Youden Index:", round(youden_index1, 3)), pos = 4)
 
 
 #######
@@ -135,4 +142,21 @@ roc_curve <- roc(data2$预后不良, data2$predicted_prob)
 lines(1 - roc_curve$specificities, roc_curve$sensitivities, col = "red", lwd = 2)
 text(0.5, 0.15, paste("AUC (验证集):", sprintf("%.3f",roc_curve$auc)), pos = 4)
 
+
+#######################
+#一下是单独画验证集的，aoc值一样，所以值都一样
+#######################
+# 计算 AUC 和最佳截断值
+auc_value2 <- roc_curve$auc
+best_coords2 <- coords(roc_curve2, "best")
+best_cutoff2 <- best_coords2["threshold"]
+sensitivity2 <- best_coords2["sensitivity"]
+specificity2 <- best_coords2["specificity"]
+youden_index2 <- sensitivity2 + specificity2 - 1
+
+text(0.5, 0.4, paste("AUC:", sprintf("%.3f",roc_curve$auc)), pos = 4)
+text(0.5, 0.35, paste("Best Cutoff:", round(best_cutoff2, 3)), pos = 4)
+text(0.5, 0.3, paste("Sensitivity:", round(sensitivity2, 3)), pos = 4)
+text(0.5, 0.25, paste("Specificity:", round(specificity2, 3)), pos = 4)
+text(0.5, 0.2, paste("Youden Index:", round(youden_index2, 3)), pos = 4)
 

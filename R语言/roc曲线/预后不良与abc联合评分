@@ -1,0 +1,176 @@
+  library(pROC)
+  library(tableone)
+  library(readxl)
+  
+  # 删除已存在的 data 对象
+  rm(data)
+  
+  # 从Excel文件中读取数据
+  data2 <- read_xlsx("D:\\test\\验证队列.xlsx", sheet = 2) # 30%
+  # 确保评分列为数值型
+  mod2 <- glm(预后不良 ~ 有无呕血 + 意识状态改变 + 肾功能不全 + 白蛋白降低 + INR延长, family = "binomial", data = data2)
+  summary(mod2)
+  
+  pre2 <- predict(mod2, type = "response", newdata = data2)
+  
+  ROC2 <- roc(data2$预后不良, pre2)
+  
+  
+  # 绘制 ROC 曲线图并添加文本
+  
+  # 计算线性组合
+  data2$linear_pred <- -3.377 + 0.806 * data2$有无呕血 + 1.152 * data2$意识状态改变 +
+    0.712 * data2$肾功能不全 + 0.973 * data2$白蛋白降低 +
+    0.899 * data2$INR延长
+  
+  # 计算预测概率 (logit function)
+  data2$predicted_prob <- 1 / (1 + exp(-data2$linear_pred))
+  
+  # 输出预测结果
+  head(data2$predicted_prob)
+  
+  ####################
+  # 两个线集中在一起 #
+  ####################
+  
+  
+  # 创建空白图
+  plot(0, 0, type = "n", xlab = "False Positive Rate (1 - Specificity)", 
+       ylab = "True Positive Rate (Sensitivity)", 
+       xlim = c(0, 1), ylim = c(0, 1), 
+       main = "ROC Curve (Model Predictions)")
+  
+  # 绘制 ROC 曲线
+  # plot(roc_obj, lwd = 2,   print.thres = TRUE, add = TRUE)
+  
+  
+  
+  #######
+  data2$linear_pred <- -3.377 + 0.806 * data2$有无呕血 + 1.152 * data2$意识状态改变 +
+    0.712 * data2$肾功能不全 + 0.973 * data2$白蛋白降低 +  0.899 * data2$INR延长
+  
+  # 计算预测概率 (logit function)
+  data2$predicted_prob <- 1 / (1 + exp(-data2$linear_pred))
+  
+  # 输出预测结果
+  head(data2$predicted_prob)
+  
+  
+  roc_curve <- roc(data2$预后不良, data2$predicted_prob)
+  
+  # 绘制 ROC 曲线图
+  # 绘制第二条 ROC 曲线（如果需要的话）
+  lines(1 - roc_curve$specificities, roc_curve$sensitivities, col = "black", lwd = 2)
+  text(0.5, 0.15, paste("AUC (验证集):", format(roc_curve$auc, nsmall = 3)), pos = 4)
+  
+  
+  
+  
+  scores <- c("GBS评分", "ABC评分")
+  scores1 <- c( "GBS评分", "ABC评分","模型")
+  
+  
+  for (score in scores) {
+    if (score %in% names(data2)) {
+      data2[[score]] <- as.numeric(data2[[score]])
+    }
+  }
+  
+  # 定义分析点和评分的列名
+  outcomes <- c("预后不良")
+  
+  
+  # 单独绘制每个分析点下的5个评分的ROC曲线
+  draw_roc_combined <- function(outcome) {
+    # 筛选出有效的目标结果列
+    valid_data <- data2[!is.na(data2[[outcome]]), ]
+    
+    if (nrow(valid_data) == 0) {
+      print(paste("No valid data for", outcome))
+      return(NULL)
+    }
+    plot(0, 0, type = "n", xlab = "False Positive Rate (1 - Specificity)", 
+         ylab = "True Positive Rate (Sensitivity)", xlim = c(0, 1), ylim = c(0, 1), 
+         main = paste("ROC Curves for", outcome))
+    
+    
+    
+    # 颜色选择
+    colors <- rainbow(length(scores1))
+    
+    # 循环绘制每个评分的ROC曲线
+    for (i in seq_along(scores)) {
+      score <- scores1[i]
+      
+      if (!(score %in% names(data2))) {
+        next
+      }
+      
+      # 处理评分缺失情况
+      score_data <- valid_data[[score]]
+      valid_scores <- !is.na(score_data)
+      
+      if (sum(valid_scores) == 0) {
+        next
+      }
+      
+      roc_obj <- roc(valid_data[[outcome]][valid_scores], score_data[valid_scores], direction="<")
+      
+      # 绘制ROC曲线
+      lines(1 - roc_obj$specificities, roc_obj$sensitivities, 
+            col = colors[i], lwd = 2)
+      lines(1 - roc_curve$specificities, roc_curve$sensitivities, col = "blue", lwd = 2)
+      # 计算AUC值
+      auc_value <- auc(roc_obj)
+      
+      # 获取最佳截断点（约登指数）
+      best_threshold_index <- which.max(roc_obj$sensitivities + roc_obj$specificities - 1)
+      best_threshold <- roc_obj$thresholds[best_threshold_index]
+      best_sensitivity <- roc_obj$sensitivities[best_threshold_index]
+      best_specificity <- roc_obj$specificities[best_threshold_index]
+      youden_index <- best_sensitivity + best_specificity - 1
+      
+      # 在图形中标注出这些统计值
+      text_x <- 0.11 + (i - 1) * 0.14  # x轴位置，从左往右逐步调整
+      text_y <- 0.08  # 固定y轴位置
+      
+
+    }
+    
+    # 添加图例  cex调整字体大小
+    legend("bottomright", legend = scores1, col = colors, lwd = 2, cex = 1)
+  }
+  
+  
+  
+  
+  #################
+  file_index <- 1  # 初始化文件序号
+  
+  output_dir <- "D:\\test\\ROC_Plots_20240929\\"  # 定义输出目录
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir)
+  }
+  
+  for (outcome in outcomes) {
+    # 规范化文件名
+    normalized_outcome <- gsub("[^[:alnum:]_]", "_", outcome)
+    
+    # 设置输出文件路径，使用序号前缀
+    output_file <- paste0(output_dir, sprintf("%03d", file_index), "_", normalized_outcome, "_ROC.png")
+    
+    # 打开PNG设备，设置正方形尺寸
+    png(output_file, width = 800, height = 800)
+    
+    # 绘制ROC曲线
+    draw_roc_combined(outcome)
+    
+    # 关闭PNG设备
+    dev.off()
+    
+    cat("ROC plot saved to:", output_file, "\n")
+    
+    # 序号递增
+    file_index <- file_index + 1
+  }
+  
