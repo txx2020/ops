@@ -3,7 +3,6 @@ library(readxl)
 
 # 从Excel文件中读取数据
 data <- read_xlsx("D:\\test\\验证队列.xlsx", sheet = 3)
-#data <- read_xlsx("D:\\test\\70.xlsx", sheet = 3)
 
 data<-as.data.frame(data)
 #建立模型公式

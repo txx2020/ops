@@ -40,8 +40,8 @@ plot(roc_curve, print.auc = TRUE, col = "blue")
 roc_curve$auc
 ci(roc_curve)
 
-# 30验证集： AUC值: 0.7909159 
-# 70训练集： AUC值: 0.7909900 
+# 30验证集： AUC值: 0.790
+# 70训练集： AUC值: 0.791
 
 
 
