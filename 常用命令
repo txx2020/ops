@@ -50,3 +50,4 @@ ssh -N -f -R 45666:127.0.0.1:8080 10.253.129.13
 # fedora 关闭swap
  systemctl mask swap.target
  systemctl daemon-reload
+ fw2XoRhOgyJncMjj
