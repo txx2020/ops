@@ -1,0 +1,31 @@
+# 适用于NetworkManager
+[connection]
+id=10
+uuid=002fbb4d-47cb-39ab-9829-69b1d0caacb3
+type=ethernet
+autoconnect-priority=-999
+interface-name=enp0s8
+timestamp=1728740386
+
+[ethernet]
+
+[ipv4]
+address1=10.10.10.15/24,10.10.10.10
+dns=8.8.8.8;8.8.4.4;
+ignore-auto-dns=true
+method=manual
+
+[ipv6]
+addr-gen-mode=default
+method=auto
+
+[proxy]
+
+# root用户下将此文件修改成600权限
+chmod 600 *.connection
+
+# 重启NetworkManager
+systemctl restart NetworkManager
+
+# 启用这个网络配置id
+nmcli connection up  '10'
