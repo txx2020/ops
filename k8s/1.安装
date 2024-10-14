@@ -143,11 +143,12 @@ EOF
 kubeadm init \
         --apiserver-advertise-address=10.10.10.2 \
         --image-repository registry.aliyuncs.com/google_containers \
-        --kubernetes-version 1.31.0 \
+        --kubernetes-version 1.31.1 \
         --service-cidr=10.20.0.0/12 \
         --pod-network-cidr=10.244.0.0/16 \
         --ignore-preflight-errors=all \
         --cri-socket unix:///var/run/cri-dockerd.sock
-
+# 初始化
+kubeadm reset --cri-socket unix:///var/run/cri-dockerd.sock
 root: U4508KWt
 user: qtCc3jOI
