@@ -51,3 +51,8 @@ ssh -N -f -R 45666:127.0.0.1:8080 10.253.129.13
  systemctl mask swap.target
  systemctl daemon-reload
  fw2XoRhOgyJncMjj
+
+# 把本机文件拷贝到远端
+ rsync $RSYNC_OPTIONS "$SRC_DIR" "$DEST_USER@$DEST_HOST:$DEST_DIR"
+# 把远端文件拷贝到本机
+ rsync $RSYNC_OPTIONS "$SRC_USER@$SRC_HOST:$SRC_DIR" "$DEST_DIR"

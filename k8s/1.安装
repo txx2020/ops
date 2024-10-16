@@ -24,7 +24,7 @@ modpreobe br_netfilter
 cat >> /etc/modules-load.d/k8s.conf << EOF
 br_netfilter
 EOF
-cat <<EOF >> /etc/sysctl.conf
+cat  >> /etc/sysctl.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
@@ -34,8 +34,8 @@ sysctl -p
 dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/fedora/docker-ce.repo
 yum update
 yum install -y docker-ce docker-compose #docker-ce-cli containerd.io
-# "data-root": "", 切换docker的路径 
-cat <<EOF>> /etc/docker/daemon.json 
+# "data-root": "", 切换docker的路径  cat <<EOF>> 这里是文件 EOF 也可以用
+cat >> /etc/docker/daemon.json <<EOF
 {
   "default-ipc-mode": "shareable",
   "exec-opts": ["native.cgroupdriver=systemd"],
@@ -59,7 +59,7 @@ cp cri-dockerd/cri-dockerd /usr/bin/
 chmod +x /usr/bin/cri-dockerd
 
 # 配置cri-docker的服务
-cat <<EOF >> /usr/lib/systemd/system/cri-docker.service 
+cat  >> /usr/lib/systemd/system/cri-docker.service <<EOF
 [Unit]
 Description=cri interface for docker app container engine
 Documentation=https://docs.mirantis.com
@@ -85,7 +85,7 @@ Killmode=process
 WantedBy=multi-user.target
 EOF
 
-cat <<EOF >> /usr/lib/systemd/system/cri-docker.socket  
+cat  >> /usr/lib/systemd/system/cri-docker.socket  <<EOF
 [Unit]
 Description=cri docker socket for the api 
 Partof=cri-docker.service
@@ -118,18 +118,15 @@ yum install -y kubelet kubeadm kubectl
 systemctl enable kubelet && systemctl start kubelet
 
 
-
 cat >> /etc/hosts << EOF
 10.10.10.13 test2
 10.10.10.14 test3
 10.10.10.15 test4
 EOF
 
-cat >> /etc/modules-load.d/k8s.conf << EOF
-br_netfilter
-EOF
 
-cat <<EOF >> /etc/sysctl.conf
+# 这里不用执行
+cat  >> /etc/sysctl.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 net.ipv4.ip_nonlocal_bind = 1
@@ -152,3 +149,37 @@ kubeadm init \
 kubeadm reset --cri-socket unix:///var/run/cri-dockerd.sock
 root: U4508KWt
 user: qtCc3jOI
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# 假如k8s集群
+kubeadm join 10.10.10.2:6443 --token gcb3qm.w570ht2nzyhtwk98 \
+	--discovery-token-ca-cert-hash sha256:613aefcc8cb5aecd9aaa9bd0158e13e9c8446e48bd09e3eeaf44972acf723046\
+  --cri-socket unix:///var/run/cri-dockerd.sock
+
+# 下载calico-typha.yml文件，在GitHub直接下载也行
+https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises#install-calico-with-kubernetes-api-datastore-more-than-50-nodes
+
+
+docker load < calico-typha-master 
+docker load < calico-kube-controllers-master  
+docker load < calico-cni-master 
+docker load < calico-node-master 
+
+
+
+# 启动错误的配置文件，导致启动了错误的pod，需要删除
+kubectl delete pod calico-kube-controllers-7bcf789c97-j9gvj -n kube-system --grace-period=0 --force
+# kubectl delete pod：表示要删除一个 Pod。
+# calico-kube-controllers-7bcf789c97-j9gvj：这是要删除的 Pod 的名称。
+# -n kube-system：指定命名空间为 kube-system，因为这个 Pod 在该命名空间下。
+# --grace-period=0：设置优雅终止的时间为 0 秒，即不等待 Pod 的正常终止过程。
+# --force：强制删除 Pod，即使它处于 Terminating 状态。
+
+# 发现由于ikuai启动失败，导致pod的某个失败，查看一下描述
+kubectl describe pod kube-proxy-lplcl -n kube-system
+
+# 经过检查发现镜像存在，是ikuai的问题，只能把这个pod删掉,删掉后发现可以使用了
+kubectl delete pod kube-proxy-lplcl -n kube-system
