@@ -87,8 +87,8 @@ draw_roc_combined <- function(outcome) {
   
   
   # 颜色选择
-  colors <- rainbow(length(scores1))
-  
+  colors <- rainbow(length(scores))
+  colors[8]="#000000"  # 在这里添加模型的颜色
   # 循环绘制每个评分的ROC曲线
   for (i in seq_along(scores)) {
     score <- scores1[i]
