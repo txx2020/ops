@@ -1,0 +1,103 @@
+library(pROC)
+library(tableone)
+library(readxl)
+
+# 删除已存在的 data 对象
+rm(data)
+
+# 从Excel文件中读取数据
+data <- read_xlsx("D:\\test\\验证队列.xlsx", sheet = 1) 
+
+# 去除列名中的 '...' 及后续字符
+names(data) <- gsub("\\.\\.\\..*", "", names(data))
+
+# 确保评分列为数值型
+scores <- c("AIMS65评分", "PRS评分", "GBS评分", "ABC评分", "mGBS评分", "JBS评分")
+
+for (score in scores) {
+  if (score %in% names(data)) {
+    data[[score]] <- as.numeric(data[[score]])
+  }
+}
+
+# 定义分析点和评分的列名
+outcomes <- c("有无出院后再出血", "有无死亡", "院内再出血", "院内死亡（死亡=1，无死亡=0）", 
+              "介入手术", "外科手术", "输血", "院内感染", "抗生素使用（有=1，无=0）", 
+              "气管插管（有=1，无=0）", "出院30天内死亡", "出院90天内死亡", 
+              "30天内再出血（有=1，无=0）", "90天内再出血（有=1，无=0）", 
+              "内镜检查有=1，无=0", "手术有无", "预后不良")
+
+# 定义绘制和标注函数
+draw_roc_combined <- function(outcome) {
+  valid_data <- data[!is.na(data[[outcome]]), ]
+  
+  if (nrow(valid_data) == 0) {
+    message("No valid data for ", outcome)
+    return(NULL)
+  }
+  
+  # 设置空白绘图区域
+  plot(0, 0, type = "n", xlab = "False Positive Rate (1 - Specificity)", 
+       ylab = "True Positive Rate (Sensitivity)", xlim = c(0, 1), ylim = c(0, 1), 
+       main = paste("ROC Curves for", outcome))
+  
+  # 循环绘制每个评分的ROC曲线
+  colors <- rainbow(length(scores))
+  
+  for (i in seq_along(scores)) {
+    score <- scores[i]
+    if (!(score %in% names(data))) next
+    
+    score_data <- valid_data[[score]]
+    valid_scores <- !is.na(score_data)
+    if (sum(valid_scores) == 0) next
+    
+    roc_obj <- roc(valid_data[[outcome]][valid_scores], score_data[valid_scores], direction="<")
+    lines(1 - roc_obj$specificities, roc_obj$sensitivities, col = colors[i], lwd = 2)
+    
+    auc_value <- auc(roc_obj)
+    best_threshold_index <- which.max(roc_obj$sensitivities + roc_obj$specificities - 1)
+    best_threshold <- roc_obj$thresholds[best_threshold_index]
+    best_sensitivity <- roc_obj$sensitivities[best_threshold_index]
+    best_specificity <- roc_obj$specificities[best_threshold_index]
+    youden_index <- best_sensitivity + best_specificity - 1
+    test1 <- data[outcome]
+    model <- lm(有无出院后再出血~AIMS65评分+PRS评分+GBS评分+ABC评分+mGBS评分+JBS评分,data=data)
+    conf_interval <- confint(model,level=0.95) 
+    # 在图形中标注信息
+    text(0.11 + (i - 1) * 0.14, 0.08, 
+         paste(score, 
+               "\nAUC:", round(auc_value, 3), 
+               "\n最佳截断值:", round(best_threshold, 3), 
+               "\n特异性:", round(best_specificity, 3), 
+               "\n灵敏度:", round(best_sensitivity, 3), 
+               "\n约登指数:", round(youden_index, 3), 
+               "\n95可信区间",round(conf_interval,3)),
+         col = colors[i], cex = 2, adj = c(0.5, 0))
+  }
+  
+  # 添加图例
+  legend("bottomright", legend = scores, col = colors, lwd = 2, cex = 1)
+}
+
+# 定义保存图片的函数
+save_roc_plot <- function(outcome, file_index, output_dir) {
+  normalized_outcome <- gsub("[^[:alnum:]_]", "_", outcome)
+  output_file <- paste0(output_dir, sprintf("%03d", file_index), "_", normalized_outcome, "_ROC.png")
+  
+  png(output_file, width = 1600, height = 1600)
+  draw_roc_combined(outcome)
+  dev.off()
+  
+  message("ROC plot saved to: ", output_file)
+}
+
+# 设置输出目录和保存图片
+output_dir <- "D:\\test\\ROC_Plots_20241024\\"
+if (!dir.exists(output_dir)) dir.create(output_dir)
+
+file_index <- 1
+for (outcome in outcomes) {
+  save_roc_plot(outcome, file_index, output_dir)
+  file_index <- file_index + 1
+}
