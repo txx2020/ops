@@ -1,3 +1,4 @@
+# https://blog.csdn.net/dege857/article/details/112461198
 # install.packages("rmda")
 library(pROC)
 library(tableone)
@@ -28,6 +29,26 @@ plot_decision_curve(List,curve.names= c( '70%验证集','30%训练集'),
                     cost.benefit.axis =FALSE,col = c( 'blue','green'),
                     confidence.intervals =FALSE,standardize = FALSE)
 
+
+# 关闭设备
+dev.off()
+
+
+# cic曲线
+#然后导入数据集
+simple<- decision_curve(预后不良~有无呕血 + 意识状态改变 + 肾功能不全 + 白蛋白降低 + INR延长, data = data1,
+                        family = binomial(link ='logit'),    #使用logistic回归来拟合模型
+                        thresholds= seq(0,1, by = 0.01),    #代码解读：thresholds横坐标阈概率的范围，一般是0-1, by是指每隔多少距离计算一个数据点
+                        confidence.intervals = 0.95,     #95%置信区间
+                        study.design = 'case-control',  #研究类型：case-control or cohort
+                        population.prevalence = 0.4)  #患病率，根据自身课题进行更改
+png("cic.png", width = 800, height = 600)
+plot_clinical_impact(simple,
+                     population.size = 409,    #样本量1000
+                     cost.benefit.axis = T,     #显示损失-收益坐标轴
+                     n.cost.benefits= 8,      
+                     col = c('red','blue'),
+                     confidence.intervals= T)
 
 # 关闭设备
 dev.off()
