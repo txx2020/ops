@@ -1,0 +1,33 @@
+# install.packages("rmda")
+library(pROC)
+library(tableone)
+library(readxl)
+library(rmda)
+data1 <- read_xlsx("D:\\tmp\\aaa.xlsx", sheet = 3) # 70%
+data2 <- read_xlsx("D:\\tmp\\aaa.xlsx", sheet = 2) # 30%
+
+# model1 <- lm(预后不良~有无呕血 + 意识状态改变 + 肾功能不全 + 白蛋白降低 + INR延长,data=data1)
+clinicalparameters<- decision_curve(预后不良~有无呕血 + 意识状态改变 + 肾功能不全 + 白蛋白降低 + INR延长,data=data1, family = binomial(link ='logit'),
+                                    thresholds= seq(0,1, by = 0.01),
+                                    confidence.intervals =0.95,study.design ='cohort')
+
+
+
+
+all<- decision_curve(预后不良~有无呕血 + 意识状态改变 + 肾功能不全 + 白蛋白降低 + INR延长,data = data2,
+                                    family = binomial(link='logit'),
+                                    thresholds= seq(0,1, by = 0.01),
+                                    confidence.intervals =0.95,study.design ='cohort')
+
+
+List<-list( clinicalparameters,all)
+
+png("dca70曲线.png", width = 800, height = 600)
+
+plot_decision_curve(List,curve.names= c( '70%验证集','30%训练集'),
+                    cost.benefit.axis =FALSE,col = c( 'blue','green'),
+                    confidence.intervals =FALSE,standardize = FALSE)
+
+
+# 关闭设备
+dev.off()
