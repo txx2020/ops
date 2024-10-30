@@ -1,0 +1,4 @@
+hbase org.apache.hadoop.hbase.mapreduce.Export INDICATOR_VALUE file:///data1/tongtu/export/hbase
+./hbase shell
+truncate 'INDICATOR_VALUE'
+hbase org.apache.hadoop.hbase.mapreduce.Driver import INDICATOR_VALUE file:///home/tongtu/server/hbase-2.2.5/import/hbase/*

@@ -1,0 +1,10 @@
+#进入vi模式
+vi
+# 输入命令,查看vi调用了哪些脚本
+scriptnames
+# 进入命令，查找含有set mouse的文件,都是以.vim 结尾的文件
+grep -Ir 'set mouse'
+# 注释掉此行
+if has ('mouse')
+  set mouse=a
+endif
