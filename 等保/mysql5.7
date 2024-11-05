@@ -1,0 +1,36 @@
+# 密码复杂度
+INSTALL PLUGIN validate_password SONAME 'validate_password.so';
+# 变量信息
+show variables like 'validate%';
+
+validate_password_check_user_name	    OFF
+validate_password_dictionary_file	
+validate_password_length	            8       # 密码最小长度
+validate_password_mixed_case_count	    1
+validate_password_number_count	        1
+validate_password_policy	            MEDIUM  #（长度+数字+字母），应修改成STRONG
+validate_password_special_char_count	1
+
+# 修改密码长度
+SET GLOBAL validate_password_length = 15;
+
+
+# 密码过期时间
+show variables like 'default_password_lifetime';
+
+# 登录超时与会话超时时间
+show variables like 'wait_timeout';
+show variables like 'interactive_timeout';
+
+# 是否开启sll
+SHOW VARIABLES LIKE 'have_ssl';
+# 用户是否强制开启ssl
+SHOW GRANTS FOR 'root'@'%';
+
+
+# 开启审计日志
+show variables like 'general_log';
+SET GLOBAL general_log = 'ON';
+
+# 日志保留天数
+show variables like 'expire_logs_days'
