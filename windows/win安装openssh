@@ -7,3 +7,8 @@ Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
 
 # Install the OpenSSH Server
 Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+
+
+# 可以直接在设置-搜索可选功能，ssh，安装，然后再任务管理器界面的服务中，找到sshd服务，
+# 然后点击启动，因为电脑上有wsl，22端口好像不能用，然后找到sshd_config修改22端口，
+# 修改成8022端口，默认的配置文件不需要改动，最后添加服务自启，就可以连接了
