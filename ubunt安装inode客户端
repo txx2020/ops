@@ -1,0 +1,10 @@
+apt -y install libjpeg62
+
+
+# ubuntu 24无法使用下面的，最好先从Ubuntu22下载
+sudo add-apt-repository ppa:linuxuprising/libpng12
+
+sudo apt update
+
+sudo apt install libpng12-0
+
