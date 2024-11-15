@@ -1,0 +1,6 @@
+# ansible需要提前关闭ssh ，$HOME下新建.ansible.cfg文件
+[defaults]
+host_key_checking = False
+
+# 安装sshpass
+apt install sshpass -y 

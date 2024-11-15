@@ -6,3 +6,10 @@ start-all.sh
 
 hdfs namenode -bootstrapStandby
 hadoop-daemon.sh start namenode
+
+# 获取主节点状态
+hdfs dfsadmin -report 
+
+
+  ./hdfs haadmin -transitionToStandby  master2   --forcemanual 
+  ./hdfs haadmin -getServiceState master1;
