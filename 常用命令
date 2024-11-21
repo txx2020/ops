@@ -59,3 +59,7 @@ ssh -N -f -R 45666:127.0.0.1:8080 10.253.129.13
 
 # docker 寻找空白的镜像
 docker images |grep none  |awk '{print $3}'  |  tr '\n' ' '
+
+ubuntu扩容
+lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+resize2fs /dev/ubuntu-vg/ubuntu-lv
