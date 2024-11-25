@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# 本地源目录 nginx1机器
+SRC_DIR="/home/tongtu/server/nginx/"
+
+# 远程目标目录 nginx2机器
+DEST_USER="tongtu"   # 用户名
+DEST_HOST1="nginx2"  # IP地址或主机名
+
+DEST_DIR="/home/tongtu/server/nginx/"  # B机器上的目标目录
+
+# rsync 同步选项
+# -a: 保留文件权限和时间戳
+# -v: 显示详细信息
+# -z: 压缩数据
+# -u: 仅更新比目标文件更新的源文件
+RSYNC_OPTIONS="-avzu"
+# RSYNC_OPTIONS="-avz --ignore-existing" 跳过相同文件，但是不校验文件的日期
+# 执行同步
+rsync $RSYNC_OPTIONS "$SRC_DIR" "$DEST_USER@$DEST_HOST1:$DEST_DIR"
+
+# 检查同步是否成功
+if [ $? -eq 0 ]; then
+  echo "Synchronization succeeded."
+else
+  echo "Synchronization failed."
+fi
