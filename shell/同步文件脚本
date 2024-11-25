@@ -16,6 +16,7 @@ DEST_DIR="/home/tongtu/server/nginx/"  # B机器上的目标目录
 # -u: 仅更新比目标文件更新的源文件
 RSYNC_OPTIONS="-avzu"
 # RSYNC_OPTIONS="-avz --ignore-existing" 跳过相同文件，但是不校验文件的日期
+# RSYNC_OPTIONS="-avz --checksum" # 即使文件大小、日期一直，也要比对hash值
 # 执行同步
 rsync $RSYNC_OPTIONS "$SRC_DIR" "$DEST_USER@$DEST_HOST1:$DEST_DIR"
 
