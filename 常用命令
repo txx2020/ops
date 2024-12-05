@@ -65,3 +65,6 @@ docker images |grep none  |awk '{print $3}'  |  tr '\n' ' '
 ubuntu扩容
 lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
 resize2fs /dev/ubuntu-vg/ubuntu-lv
+
+# 镜像更新的命令
+docker compose pull && docker compose up -d
