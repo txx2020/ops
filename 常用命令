@@ -68,3 +68,9 @@ resize2fs /dev/ubuntu-vg/ubuntu-lv
 
 # 镜像更新的命令
 docker compose pull && docker compose up -d
+
+# docker 把两个架构镜像打包成一个标签
+docker manifest create control-server.com/java/openjdk:8u342-slim-buster --amend control-server.com/java/openjdk:x86 --amend control-server.com/java/openjdk:arm
+
+# 上传镜像
+docker manifest push  control-server.com/java/openjdk:8u342-slim-buster
