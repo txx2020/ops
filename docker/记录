@@ -3,3 +3,11 @@
 # 镜像，同时会pull镜像，如果pull不到就会从本地查找，这种方法肯定是不行的，因为默认安装的是往官方推送，我现在要做的是往私人的Harbor
 # 推送，所以我需要找方法，接下来去实践。
 
+# docker下执行
+docker buildx create --use --bootstrap \
+  --name mybuilder \
+  --driver docker-container \
+  --config ./buildkitd.toml
+
+# jenkins下测试
+docker buildx build --platform linux/amd64,linux/arm64 -t control-server.com/java/test:1.0.1-test -t control-server.com/java/test:1.0.1-test --push .
