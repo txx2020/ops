@@ -1,0 +1,25 @@
+version: '3'
+services:
+  minio:
+    image: minio/minio:latest
+    hostname: minio2
+      #ports:
+      #- 9000:9000
+      #- 9001:9001
+    network_mode: host
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin123ttyj7890uiop
+    volumes:
+      - ./data1:/data1
+        #- ./data2:/data2
+        #- ./data3:/data3
+        #- ./data:/data
+        #- ./config:/root/.minio/     #映射配置目录
+    command: server  http://10.1.4.{18...20}/data1  --console-address "0.0.0.0:9001" --address "0.0.0.0:9000"
+    privileged: true
+    restart: always
+    extra_hosts:
+      - "minio1:10.1.4.18"
+      - "minio2:10.1.4.19"
+      - "minio3:10.1.4.20"
