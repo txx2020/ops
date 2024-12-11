@@ -23,9 +23,9 @@ archive_mode = on    # enables archiving; off, on, or always
 recovery_target_timeline = 'latest'  # 'current', 'latest', or timeline ID
 primary_conninfo = 'host=10.1.4.13 port=5432 user=tongtu password=adminTTyj&*90UIop'
 hot_standby = on      # "off" disallows queries during recovery
-log_timezone = 'Etc/UTC'
+log_timezone = 'Asia/Shangha'
 datestyle = 'iso, mdy'
-timezone = 'Etc/UTC'
+timezone = 'Asia/Shangha'
 lc_messages = 'en_US.utf8'       # locale for system error message
 lc_monetary = 'en_US.utf8'       # locale for monetary formatting
 lc_numeric = 'en_US.utf8'      # locale for number formatting

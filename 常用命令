@@ -74,3 +74,6 @@ docker manifest create control-server.com/java/openjdk:8u342-slim-buster --amend
 
 # 上传镜像
 docker manifest push  control-server.com/java/openjdk:8u342-slim-buster
+
+# on-my-zsh添加主机名，%m 在%c前面，需要有个空格
+vim $ZSH/themes/robbyrussell.zsh-theme
