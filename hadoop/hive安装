@@ -1,0 +1,13 @@
+# 使用的postgres数据，新建用户
+#创建用户hive_user:
+create user hive_user;
+#创建DB metastore_db，owner为hive_user:
+create database metastore_db with owner=hive_user;
+#设置hive_user的密码：
+ALTER USER hive_user WITH PASSWORD '123456';
+
+# 初始化元数据
+ ./schematool -initSchema -dbType postgres
+
+ # 启动服务
+ nohup ./hive --service metastore  &
