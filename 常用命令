@@ -29,6 +29,9 @@ rcvbuf 0   #新增优化项
 # 所有流量全部走openvpn
 客户端添加：redirect-gateway autolocal
 
+# openvpn 2.5.2版本连接报错解决，用户端配置文件添加
+allow-compression yes
+
 #hadoop下载文件
 ./hdfs dfs -get  /hanyi/检测/1标段下部利旧图片   file:///home/tongtu/bak/hadoop/export
 #hadoop 上传文件
