@@ -11,5 +11,5 @@ debug = true
 #  options=["edns0"]
 #  searchDomains=["example.com"]
 
-[worker.containerd]
-  platforms = [ "linux/amd64", "linux/arm64" ]
+#[worker.containerd]
+#  platforms = [ "linux/amd64", "linux/arm64" ]
