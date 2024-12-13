@@ -1,57 +1,8 @@
-version: '3'
-services:
-  configsvr1:
-    privileged: true
-    container_name: config
-    image: control-server.com/base/mongo:7.0.15-jammy
-    command: mongod --configsvr --replSet config_rs --dbpath /data/db --port 27017
-    ports:
-      - 27018:27017
-    volumes:
-      - ./data/configsvr1:/data/db
-  shard1:
-    privileged: true
-    container_name: shard1
-    image: control-server.com/base/mongo:7.0.15-jammy
-    command: mongod --replSet shard1_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1
-    ports:
-      - 27019:27017
-    volumes:
-      - ./data/shard1:/data/db
-  shard2:
-    privileged: true
-    container_name: shard2
-    image: control-server.com/base/mongo:7.0.15-jammy
-    command: mongod --replSet shard2_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1
-    ports:
-      - 27020:27017
-    volumes:
-      - ./data/shard2:/data/db
-  shard3:
-    privileged: true
-    container_name: shard3
-    image: control-server.com/base/mongo:7.0.15-jammy
-    command: mongod --replSet shard3_rs --dbpath /data/db --port 27017 --bind_ip 0.0.0.0 --logpath /tmp/mongo.log --shardsvr --wiredTigerCacheSizeGB 1
-    ports:
-      - 27021:27017
-    volumes:
-      - ./data/shard3:/data/db
-  mongos:
-    privileged: true
-    container_name: mongos
-    image: control-server.com/base/mongo:7.0.15-jammy
-    command: mongos --configdb config_rs/10.100.14.17:27018,10.100.14.18:27018,10.100.14.19:27018 --port 27017 --bind_ip_all
-    ports:
-      - 27017:27017
-
-
-
-
 version: "3"
 services:
-  mongodb1:
+  mongodb1: # 可以修改
     image: control-server.com/base/mongo:7.0.15-jammy
-    container_name: mongo1
+    container_name: mongo1 # 可以修改
     restart: always
     ports:
       - "27017:27017"
@@ -76,5 +27,6 @@ services:
         chmod 400 /mongodb.key
         chown 999:999 /mongodb.key
         exec docker-entrypoint.sh $$@
-
+# openssl rand -base64 20 > mongodb.key
+# 文件需要提前生成
 
