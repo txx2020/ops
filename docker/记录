@@ -7,7 +7,8 @@
 docker buildx create --use --bootstrap \
   --name mybuilder \
   --driver docker-container \
-  --config ./buildkitd.toml
-
+  --config ./buildkitd.toml \
+  --driver-opt network=host #\
+  #--platform linux/arm64,linux/arm/v7
 # jenkins下测试
 docker buildx build --platform linux/amd64,linux/arm64 -t control-server.com/java/test:1.0.1-test -t control-server.com/java/test:1.0.1-test --push .

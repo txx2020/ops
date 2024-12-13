@@ -1,0 +1,15 @@
+# /etc/buildkitd.toml
+debug = true
+[registry."control-server.com"]
+  ca=["/root/data/cert/ca.crt"]
+  [[registry."control-server.com".keypair]]
+    key="/root/data/cert/control-server.com.key"
+    cert="/root/data/cert/control-server.com.crt"
+
+[dns]
+  nameservers=["192.168.1.210"]
+#  options=["edns0"]
+#  searchDomains=["example.com"]
+
+[worker.containerd]
+  platforms = [ "linux/amd64", "linux/arm64" ]
