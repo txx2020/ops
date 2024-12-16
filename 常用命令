@@ -80,3 +80,8 @@ docker manifest push  control-server.com/java/openjdk:8u342-slim-buster
 
 # on-my-zsh添加主机名，%m 在%c前面，需要有个空格
 vim $ZSH/themes/robbyrussell.zsh-theme
+
+vi .zshrc
+bindkey "\e[1~" beginning-of-line  # Home键
+bindkey "\e[4~" end-of-line  # End键
+
