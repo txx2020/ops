@@ -64,7 +64,7 @@ ip addr del 192.168.1.210/24 dev eth0 # eth0是网卡名称,这个网卡必须�
 
 # docker 寻找空白的镜像
 docker images |grep none  |awk '{print $3}'  |  tr '\n' ' '
-
+docker buildx prune # 清理docker buildx 缓存
 ubuntu扩容
 lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
 resize2fs /dev/ubuntu-vg/ubuntu-lv
