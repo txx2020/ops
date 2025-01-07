@@ -48,6 +48,12 @@ allow-compression yes
 
 # hadoop 删除楚天的图片数据
 ./hadoop fs -ls /EdgeDevice/img | grep '^d' | awk '{print $8}' | grep -E '/EdgeDevice/img/2023-(0[1-9]|10|11|12)-(0[1-9]|[12][0-9]|3[01])' | grep -E '/EdgeDevice/img/2023-(0[1-9]|10|11)-(0[1-9]|[12][0-9]|3[01])|2023-12-0[1-3]' | while read folder; do hadoop fs -rm -r "$folder"; done
+
+#ssh端口转发之前需要做的事情,如果报错可以-vvvvv查看详细信息
+/etc/ssh/sshd_config
+AllowTcpForwarding no
+PermitTunnel no
+
 # 210 服务器把自身的8080端口转发到10.253.129.13的45666端口
 ssh -N -f -R 45666:127.0.0.1:8080 10.253.129.13 # /usr/bin/ssh -N -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -R 8080:127.0.0.1:8080 tongtu-gitlab.com 改进版
 ip addr add 192.168.1.210/24 dev eth0 # 为了可以直接使用jenkins中的地址，我就添加了ip
