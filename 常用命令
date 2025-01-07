@@ -59,8 +59,11 @@ GatewayPorts yes
 PermitTunnel yes
 # yum 使用代理 /etc/yum.conf,需要先完成下面的操作
 proxy=socks5://127.0.0.1:8080 
-# 将ssh转发到目标机器
+# 将ssh转发到目标机器，且仅当前机器可连接
 /usr/bin/ssh -N -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -R 18080:127.0.0.1:22 10.253.129.43
+# 将ssh转发到目标机器，所有机器或同网段机器可连接
+/usr/bin/ssh -N -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -R 0.0.0.0:18080:127.0.0.1:22 10.253.129.43
+/usr/bin/ssh -N -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -R 10.253.129.43:18080:127.0.0.1:22 10.253.129.43
 # 目标机器连接代理
 ssh -D 8080  localhost -p 18080
 # 验证代理是否成功
