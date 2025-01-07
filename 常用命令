@@ -53,6 +53,10 @@ allow-compression yes
 /etc/ssh/sshd_config
 AllowTcpForwarding no
 PermitTunnel no
+修改成
+AllowTcpForwarding yes
+GatewayPorts yes
+PermitTunnel yes
 
 # 210 服务器把自身的8080端口转发到10.253.129.13的45666端口
 ssh -N -f -R 45666:127.0.0.1:8080 10.253.129.13 # /usr/bin/ssh -N -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -R 8080:127.0.0.1:8080 tongtu-gitlab.com 改进版
