@@ -1,0 +1,12 @@
+# 调整时区
+timedatectl set-timezone Asia/Shanghai
+
+
+vim /etc/systemd/timesyncd.conf
+# 修改成下面的
+[Time]
+NTP=ntp.tencent.com
+FallbackNTP=ntp1.tencent.com,ntp2.tencent.com,ntp3.tencent.com
+RootDistanceMaxSec=5
+PollIntervalMinSec=32
+PollIntervalMaxSec=2048
