@@ -59,6 +59,12 @@ GatewayPorts yes
 PermitTunnel yes
 # yum 使用代理 /etc/yum.conf,需要先完成下面的操作
 proxy=socks5://127.0.0.1:8080 
+# 将ssh转发到目标机器
+/usr/bin/ssh -N -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -R 18080:127.0.0.1:22 10.253.129.43
+# 目标机器连接代理
+ssh -D 8080  localhost -p 18080
+# 验证代理是否成功
+curl --socks5-hostname localhost:8001 http://www.google.com/ 
 # 210 服务器把自身的8080端口转发到10.253.129.13的45666端口
 ssh -N -f -R 45666:127.0.0.1:8080 10.253.129.13 # /usr/bin/ssh -N -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -R 8080:127.0.0.1:8080 tongtu-gitlab.com 改进版
 ip addr add 192.168.1.210/24 dev eth0 # 为了可以直接使用jenkins中的地址，我就添加了ip
