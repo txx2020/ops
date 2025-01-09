@@ -1,0 +1,69 @@
+#!/bin/bash
+lines=70
+# 定义临时目录和安装文件
+TMP_DIR="/tmp/docker-install"
+ARCHIVE="docker-install.tar.gz"
+
+# 检查系统的架构是否符合
+if [[ "$(arch)" == "aarch64" ]]; then
+    echo "架构相同"
+else
+    echo "架构不同, 本机架构为$(arch)"
+    exit 1
+fi
+
+# 创建临时目录
+mkdir -p $TMP_DIR
+
+# 解压压缩包
+echo "正在解压安装文件..."
+
+tail -n +$lines $0 > $ARCHIVE
+tar -xzvf $ARCHIVE -C $TMP_DIR
+
+
+# 检查解压结果
+if [[ $? -ne 0 ]]; then
+    echo "解压失败，请检查压缩包完整性！"
+    exit 1
+fi
+
+# 进入解压目录
+cd $TMP_DIR || exit 1
+
+# 执行安装操作
+echo "正在安装依赖包..."
+rpm -ivh --replacepkgs --replacefiles container-selinux/policycoreutils-2.8-14.2.p01.ky10.aarch64.rpm
+rpm -ivh container-selinux/python2-libselinux-2.9-se.05.ky10.aarch64.rpm
+rpm -ivh --replacepkgs --replacefiles container-selinux/python3-policycoreutils-2.8-14.2.p01.ky10.noarch.rpm
+rpm -ivh container-selinux/policycoreutils-python-utils-2.8-14.2.p01.ky10.noarch.rpm
+rpm -ivh container-selinux/python2-libsemanage-2.9-se.01.ky10.aarch64.rpm
+rpm -ivh container-selinux/python2-enum34-1.1.6-8.ky10.noarch.rpm
+rpm -ivh container-selinux/python2-setools-4.1.1-17.ky10.aarch64.rpm
+rpm -ivh container-selinux/python2-audit-3.0-5.se.04.ky10.aarch64.rpm
+rpm -ivh container-selinux/python2-IPy-0.81-26.ky10.noarch.rpm
+rpm -ivh container-selinux/python2-policycoreutils-2.8-14.2.p01.ky10.noarch.rpm
+rpm -ivh container-selinux/policycoreutils-devel-2.8-14.2.p01.ky10.aarch64.rpm
+rpm -ivh container-selinux/container-selinux-2.119.2-1.911c772.el7_8.noarch.rpm
+rpm -ivh docker/*
+
+# 清理临时文件
+echo "清理临时文件..."
+cd /tmp
+rm -rf $TMP_DIR $ARCHIVE
+cat > daemon.json <<EOF
+{
+"insecure-registries": ["control-server.com"]
+}
+EOF
+mv daemon.json /etc/docker
+systemctl daemon-reload 
+systemctl start docker
+systemctl enable docker
+echo "安装完成！"
+echo "请勿将root权限开放！！！"
+echo "请将普通用户授予docker权限!!!"
+echo "执行以下命令："
+echo "usermod -aG docker 用户名"
+echo "newgrp 用户名"
+exit 0
