@@ -1,0 +1,24 @@
+https://www.cnblogs.com/nieqibest/p/11408373.html
+
+swarm mode 下 运行 docker stack deploy 命令 pull 下来的 image tag 为none
+首先是在公司的测试环境上发现了这个现象，网上search了一番，这个并不是错误，而是swarm下的一种机制：
+
+当使用 Swarm Stacks时，为了保证Service的副本在每个节点上运行的是相同的镜像，
+
+Swarm采用的是一种叫 Pinning-by-Digest的策略，
+
+而不是根据镜像的tag来使用镜像。
+
+Service会将你指定的镜像tag转换成digest id，并使用这个digest去拉取镜像。
+
+使用 docker service ls 可以查看各个服务使用的镜像版本。
+
+生产实践中最好不要用lastest的镜像tag，可以使用v2.1.0这样的命名。
+
+ 
+
+参考：https://github.com/moby/moby/issues/28908
+
+           https://success.docker.com/article/images-tagging-vs-digests
+
+           https://stackoverflow.com/questions/50152854/docker-swarm-docker-stack-deploy-results-on-untagged-images-none
