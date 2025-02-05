@@ -105,3 +105,6 @@ vi .zshrc
 bindkey "\e[1~" beginning-of-line  # Home键
 bindkey "\e[4~" end-of-line  # End键
 
+# 网络丢包率测试
+iperf3 -s # 服务器端安装
+iperf3 -c ip # 客户端安装
