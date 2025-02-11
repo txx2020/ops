@@ -1,0 +1,61 @@
+# 先在hosts内添加ip
+tee -a /etc/hosts << 'EOF'
+10.253.129.43 t43
+10.253.129.44 t44
+10.253.129.45 t45
+10.253.129.46 t46
+10.253.129.47 t47
+10.253.129.42 k8s.control-server.com  # vip地址
+EOF
+
+# 添加Ansible的hosts
+tee -a /etc/ansible/hosts << 'EOF'
+[master]
+t[46:47]
+
+[work]
+t[43:45]
+
+[k8s:children]
+master
+work
+
+[k8s:vars]
+ansible_user=tongtu
+ansible_port=22
+ansible_ssh_pass=ttyj7890
+ansible_become_password=ttyj7890
+EOF
+
+# 生成ssh-key，记录为,添加备注：yunwei@tongtu
+ssh-keygen -t ed25519 -C "yunwei@tongtu"
+
+# 分发密钥,会提示输入密码
+for i in $(seq 43 47);do ssh-copy-id -o StrictHostKeyChecking=no -p 22 tongtu@t${i};done
+
+# 验证ansible
+ansible k8s -m ping -o
+ansible work -m ping -o
+
+# 批量添加hosts
+ansible k8s -m lineinfile -a 'path=/etc/hosts line="10.253.129.43 t43" create=yes' -o --become
+ansible k8s -m lineinfile -a 'path=/etc/hosts line="10.253.129.44 t44" create=yes' -o --become
+ansible k8s -m lineinfile -a 'path=/etc/hosts line="10.253.129.45 t45" create=yes' -o --become
+ansible k8s -m lineinfile -a 'path=/etc/hosts line="10.253.129.46 t46" create=yes' -o --become
+ansible k8s -m lineinfile -a 'path=/etc/hosts line="10.253.129.47 t47" create=yes' -o --become
+ansible k8s -m lineinfile -a 'path=/etc/hosts line="10.253.129.42 k8s.control-server.com" create=yes' -o --become
+
+# 自动同步时间以及主机时区设置
+ansible k8s -m shell -a "ntpdate ntp1.aliyun.com" -o
+ansible k8s -m shell -a "timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0" -o 
+
+# 此处KylinOS安全加固模板是采用的chronyd同步而非ntpdate，而需将ntp.aliyun.com更改为ntp1.aliyun.com
+ansible k8s -m replace -a 'path=/etc/chrony.conf regexp="ntp.aliyun.com" replace="ntp1.aliyun.com"' -o
+
+# 禁用swap
+ # 临时生效
+ansible k8s -m shell -a "sysctl -w vm.swappiness=0"
+ # 永久生效
+ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="# 部署 Kubernetes 集群相关内核参数配置"' -o
+    ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="vm.swappiness = 0"' -o
+
