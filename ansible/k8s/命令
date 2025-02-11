@@ -46,16 +46,59 @@ ansible k8s -m lineinfile -a 'path=/etc/hosts line="10.253.129.47 t47" create=ye
 ansible k8s -m lineinfile -a 'path=/etc/hosts line="10.253.129.42 k8s.control-server.com" create=yes' -o --become
 
 # 自动同步时间以及主机时区设置
-ansible k8s -m shell -a "ntpdate ntp1.aliyun.com" -o
-ansible k8s -m shell -a "timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0" -o 
+#ansible k8s -m shell -a "ntpdate ntp1.aliyun.com" -o
+#ansible k8s -m shell -a "timedatectl set-timezone Asia/Shanghai && timedatectl set-local-rtc 0" -o 
 
 # 此处KylinOS安全加固模板是采用的chronyd同步而非ntpdate，而需将ntp.aliyun.com更改为ntp1.aliyun.com
-ansible k8s -m replace -a 'path=/etc/chrony.conf regexp="ntp.aliyun.com" replace="ntp1.aliyun.com"' -o
+#ansible k8s -m replace -a 'path=/etc/chrony.conf regexp="ntp.aliyun.com" replace="ntp1.aliyun.com"' -o
 
 # 禁用swap
  # 临时生效
-ansible k8s -m shell -a "sysctl -w vm.swappiness=0"
+#ansible k8s -m shell -a "sysctl -w vm.swappiness=0"
+ansible k8s -m shell -a 'swapoff -a' --become
  # 永久生效
-ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="# 部署 Kubernetes 集群相关内核参数配置"' -o
-    ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="vm.swappiness = 0"' -o
+#ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="# 部署 Kubernetes 集群相关内核参数配置"' -o
+#    ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="vm.swappiness = 0"' -o
 
+# 安装ipvsadm
+ansible k8s -m shell -a 'yum install ipvsadm -y ' --become
+
+# 启用
+ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="net.ipv4.ip_forward=1" state=present create=yes' -o --become # state=present不添加默认有
+# ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="net.ipv4.ip_forward=1" state=absent' -o --become # 删除
+ansible k8s -m shell -a 'sysctl -p ' --become
+
+ansible k8s -m shell -a 'yum install bridge-utils -y' --become
+ansible k8s -m shell -a 'modprobe br_netfilter' --become
+
+ansible k8s -m lineinfile -a 'path=/etc/modules-load.d/k8s.conf line="br_netfilter" state=present create=yes' -o --become
+
+ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="net.bridge.bridge-nf-call-ip6tables=1" state=present create=yes' -o --become
+ansible k8s -m lineinfile -a 'path=/etc/sysctl.conf line="net.bridge.bridge-nf-call-iptables=1" state=present create=yes' -o --become
+
+ansible k8s -m shell -a 'sysctl -p ' --become
+
+# 执行前需要$HOME下新建.ansible.cfg文件
+#[defaults]
+#host_key_checking = False
+sudo ansible k8s -m copy -a "src=/etc/docker/daemon.json dest=/etc/docker/daemon.json force=yes" -o --become
+
+ansible k8s -m shell -a 'systemctl daemon-reload && systemctl restart docker && systemctl enable docker' --become
+
+sudo ansible k8s -m copy -a "src=/usr/bin/cri-dockerd dest=/usr/bin/cri-dockerd force=yes" -o --become
+ansible k8s -m shell -a 'chmod +x /usr/bin/cri-dockerd' --become
+
+sudo ansible k8s -m copy -a "src=/usr/lib/systemd/system/cri-docker.service dest=/usr/lib/systemd/system/cri-docker.service force=yes" -o --become
+sudo ansible k8s -m copy -a "src=/usr/lib/systemd/system/cri-docker.socket dest=/usr/lib/systemd/system/cri-docker.socket force=yes" -o --become
+
+ansible k8s -m shell -a 'systemctl daemon-reload && systemctl enable cri-docker && systemctl start cri-docker && systemctl is-active cri-docker' --become
+
+sudo ansible k8s -m copy -a "src=/etc/yum.repos.d/kubernetes.repo dest=/etc/yum.repos.d/kubernetes.repo force=yes" -o --become
+
+ansible k8s -m shell -a "setenforce 0" -o --become
+
+ansible k8s -m shell -a "yum install -y kubelet kubeadm kubectl" -o --become
+
+ansible k8s -m shell -a "systemctl enable kubelet && systemctl start kubelet" -o --become
+
+ansible k8s -m shell -a "kubeadm join 10.253.129.47:6443 --token v0a9tg.b2fshv8m1063q47a   --discovery-token-ca-cert-hash sha256:7c638094a4f55be14cc4d61090e784b437996fb4b61909cb8e91c8d262e9b20e --cri-socket unix:///var/run/cri-dockerd.sock" -o --become
