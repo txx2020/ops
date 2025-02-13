@@ -1,0 +1,166 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: activemq-cluster
+  namespace: activemq-cluster
+spec:
+  selector:
+    app: activemq-cluster
+  ports:
+    - port: 8161
+      targetPort: 8161
+      protocol: TCP
+      name: admin
+      nodePort: 30168
+    - port: 61616
+      targetPort: 61616
+      protocol: TCP
+      name: tcp
+      nodePort: 30618
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: activemq-cluster0 #这里根据集群数量配置多个statefulSet，因为每个deploy中容器挂在的activemq文件不同
+  namespace: activemq-cluster
+spec:
+  serviceName: activemq-headless-cluster
+  replicas: 1
+  selector:
+    matchLabels:
+      name: activemq-cluster0 # statufulSet管理的pod标签
+  template:
+    metadata:
+      labels:
+        name: activemq-cluster0 #Pod的标签
+        app: activemq-cluster
+    spec:
+      containers:
+        - name: activemq
+
+          #测试过apache/activemq-classic，可以修改borkerName但是集群网络不能互通
+          #测试过webcenter/activemq，修改brokerName无效，故此只能2个实例集群，多台实例无效
+          #最终使用这个镜像能实现多台实例集群
+          image: control-server.com/base/apache/activemq-classic:6.1.2
+          ports:
+            - containerPort: 61616
+              name: tcp
+            - containerPort: 8161
+              name: admin
+          volumeMounts:
+            - name: config-activemq
+              mountPath: /opt/activemq/conf/activemq.xml #configmap中的activemq0.xml文件挂在到容器的这个目录下
+              subPath: activemq.xml
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: config-activemq
+          configMap:
+            name: cm-activemq
+            items:
+              - key: activemq0 # cm-activemq 的key
+                path: activemq.xml # cm-activemq 的key对应的值的以文本名为activemq.xml的形式展现
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: activemq-cluster1
+  namespace: activemq-cluster
+spec:
+  serviceName: activemq-headless-cluster
+  replicas: 1
+  selector:
+    matchLabels:
+      name: activemq-cluster1
+  template:
+    metadata:
+      labels:
+        name: activemq-cluster1
+        app: activemq-cluster
+    spec:
+      containers:
+        - name: activemq
+          image: control-server.com/base/apache/activemq-classic:6.1.2
+          ports:
+            - containerPort: 61616
+              name: tcp
+            - containerPort: 8161
+              name: admin
+          volumeMounts:
+            - name: config-activemq
+              mountPath: /opt/activemq/conf/activemq.xml
+              #              mountPath: /opt/apache-activemq/conf/activemq.xml
+              subPath: activemq.xml
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: config-activemq
+          configMap:
+            name: cm-activemq
+            items:
+              - key: activemq1
+                path: activemq.xml
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: activemq-cluster2
+  namespace: activemq-cluster
+spec:
+  serviceName: activemq-headless-cluster
+  replicas: 1
+  selector:
+    matchLabels:
+      name: activemq-cluster2
+  template:
+    metadata:
+      labels:
+        name: activemq-cluster2
+        app: activemq-cluster
+    spec:
+      containers:
+        - name: activemq
+          image: control-server.com/base/apache/activemq-classic:6.1.2
+          # image: apache/activemq-classic:latest
+          ports:
+            - containerPort: 61616
+              name: tcp
+            - containerPort: 8161
+              name: admin
+          volumeMounts:
+            - name: config-activemq
+              mountPath: /opt/activemq/conf/activemq.xml
+              #              mountPath: /opt/apache-activemq/conf/activemq.xml
+              subPath: activemq.xml
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: config-activemq
+          configMap:
+            name: cm-activemq
+            items:
+              - key: activemq2
+                path: activemq.xml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: activemq-headless-cluster
+  namespace: activemq-cluster
+spec:
+  ports:
+    - port: 61616
+      targetPort: tcp
+      name: tcp
+    - port: 8161
+      targetPort: web
+      name: web
+    - port: 1883
+      targetPort: mqtt
+      name: mqtt
+  selector:
+    app: activemq-cluster

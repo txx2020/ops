@@ -1,0 +1,11 @@
+# 创建命名空间 activemq-cluster
+kubectl create ns activemq-cluster
+
+# 创建configMap，cm-activemq
+kubectl create cm cm-activemq --from-file ./configs/ activemq-cluster # key会以文件名命名
+# 推荐用下面这种
+
+kubectl create configmap cm-activemq \
+--from-file=activemq0=activemq0.xml \
+--from-file=activemq1=activemq1.xml \
+--from-file=activemq2=activemq2.xml ;

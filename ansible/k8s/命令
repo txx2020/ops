@@ -95,10 +95,16 @@ ansible k8s -m shell -a 'systemctl daemon-reload && systemctl enable cri-docker 
 
 sudo ansible k8s -m copy -a "src=/etc/yum.repos.d/kubernetes.repo dest=/etc/yum.repos.d/kubernetes.repo force=yes" -o --become
 
-ansible k8s -m shell -a "setenforce 0" -o --become
+ansible k8s -m shell -a "setenforce 0" --become
 
-ansible k8s -m shell -a "yum install -y kubelet kubeadm kubectl" -o --become
+ansible k8s -m shell -a "yum install -y kubelet kubeadm kubectl" --become
 
-ansible k8s -m shell -a "systemctl enable kubelet && systemctl start kubelet" -o --become
+ansible k8s -m shell -a "systemctl enable kubelet && systemctl start kubelet" --become
 
-ansible k8s -m shell -a "kubeadm join 10.253.129.47:6443 --token v0a9tg.b2fshv8m1063q47a   --discovery-token-ca-cert-hash sha256:7c638094a4f55be14cc4d61090e784b437996fb4b61909cb8e91c8d262e9b20e --cri-socket unix:///var/run/cri-dockerd.sock" -o --become
+ansible k8s -m shell -a "kubeadm join 10.253.129.47:6443 --token v0a9tg.b2fshv8m1063q47a   --discovery-token-ca-cert-hash sha256:7c638094a4f55be14cc4d61090e784b437996fb4b61909cb8e91c8d262e9b20e --cri-socket unix:///var/run/cri-dockerd.sock" --become
+
+ansible k8s -m shell -a "mkdir -p /home/tongtu/.kube"
+ansible k8s -m shell -a "cp -i /etc/kubernetes/admin.conf $HOME/.kube/config" --become
+ansible k8s -m shell -a "chown tongtu:tongtu $HOME/.kube/config" --become
+          
+ansible k8s -m shell -a 'docker rm $(docker ps -a -f status=exited -q)'
