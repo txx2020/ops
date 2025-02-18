@@ -1,0 +1,125 @@
+为小米5s(capricorn)构建内核并加载原厂wlan驱动
+https://www.bilibili.com/opus/953638874685374484
+
+Seraph_路人葵
+2024年07月13日 20:45
+[准备工作]
+
+首先需要准备内核源码，建议使用来自小米官方仓库的源码，使用以下命令克隆仓库: git clone https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git -b scorpio-o-oss。
+
+然后需要准备编译工具链，由于Google的GCC4.9工具链已不可用，可以使用其他人提供的仓库: git clone https://github.com/FalconJaw/android-kernel-tools.git。
+
+同步完成后工作目录中应该有以下两个目录: Xiaomi_Kernel_OpenSource和android-kernel-tools。
+
+
+
+为了方便构建，我们可以编写一个脚本来配置环境变量以及内核相关编译参数:
+
+TOOLCHAIN_PATH="$(realpath $(dirname $0)/../android-kernel-tools)"
+
+PATH="$TOOLCHAIN_PATH/build-tools/linux-x86/bin:$PATH"
+
+PATH="$TOOLCHAIN_PATH/build-tools/path/linux-x86:$PATH"
+
+PATH="$TOOLCHAIN_PATH/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin:$PATH"
+
+PATH="$TOOLCHAIN_PATH/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin:$PATH"
+
+PATH="$TOOLCHAIN_PATH/clang/host/linux-x86/**clang-r407598**/bin:$PATH"
+
+PATH="$TOOLCHAIN_PATH/misc/linux-x86/lz4:$PATH"
+
+PATH="$TOOLCHAIN_PATH/misc/linux-x86/dtc:$PATH"
+
+PATH="$TOOLCHAIN_PATH/misc/linux-x86/libufdt:$PATH"
+
+export PATH="$PATH"
+
+export LD_LIBRARY_PATH="$TOOLCHAIN_PATH/clang/host/linux-x86/**clang-r407598**/lib64:$LD_LIBRARY_PATH"
+
+make \
+
+O=out \
+
+INSTALL_MOD_PATH=sysroot \
+
+ARCH=arm64 \
+
+SUBARCH=ARM64 \
+
+CLANG_TRIPLE=aarch64-linux-gnu- \
+
+CROSS_COMPILE=aarch64-linux-android- \
+
+CROSS_COMPILE_ARM32=arm-linux-androideabi- \
+
+$@
+
+将以上脚本保存到Xiaomi_Kernel_OpenSource/build.sh
+
+
+
+[编译准备阶段]
+
+在此之前，我们需要一些编译内核必须的软件包: libncurses-dev python-is-python3 bc flex bison pkg-config
+
+进入Xiaomi_Kernel_OpenSource并执行: sh build.sh gemini_user_defconfig
+
+PS: gemini内核与capricorn内核基本兼容
+
+接下来执行sh build.sh menuconfig进入内核配置界面
+
+--> General setup
+
+在这一部分可以修改Local version以方便在系统设置中看到改变，可以设置任意自己喜欢的字符串，随后关闭Automatically append version information to the version string, 这样内核版本号就不会显示为xxx-dirty, 而是类似于3.18.71+。
+
+--> Enable loadable module support
+
+为保证可以加载官方镜像中的wlan.ko无线网络驱动程序，我们需要在这里做出一些更改,开启选项: Forced module loading, 关闭选项: Module signature verification。
+
+双击ESC后回车保存修改。
+
+
+
+接下来，我们需要修正一些代码以保证内核通过编译:
+
+打开scripts/dtc/dtc-lexer.lex.c_shipped, 在640行前加上extern, 修改前: YYLTYPE yylloc; 修改后: extern YYLTYPE yylloc;
+
+如果系统上的编译器版本较高并且遇到了ncurses.h相关的错误, 可以修改scripts/kconfig/lxdialog/check-lxdialog.sh, 在第50行前加上int。
+
+
+
+注释kernel/module.c的第1153行以允许强制加载官方镜像中的wlan.ko (// if (versindex == 0))
+
+
+
+[开始编译]
+
+接下来就可以开始编译了，使用sh build.sh即可，可以适当提升线程数以提高系统资源利用率，例如以20线程编译: sh build.sh -j 20。
+
+编译完成后的内核位于out/arch/arm64/boot/Image.gz-dtb, 将其复制出来到你的工作目录。
+
+
+
+ [重新打包boot.img]
+
+ 在此之前我们需要一些软件: abootimg fastboot
+
+ 想办法获取boot.img, 使用以下命令解包boot.img: abootimg -x boot.img, 你将得到以下文件: bootimg.cfg, initrd.img, zImage。
+
+ 接下来使用以下命令重新打包boot.img: abootimg --create boot.img -f bootimg.cfg -r initrd.img -k Image.gz-dtb。
+
+
+
+ [刷入内核并启动设备]
+
+ 使用以下命令刷入新的boot.img: fastboot flash boot boot.img
+
+ 如果一切顺利，设备重启后将正常进入系统并且WIFI功能正常，你将在系统设置中看到你自定义的内核版本号。
+
+
+
+[杂项]
+
+如果已关闭"Automatically append version information to the version string"并且不喜欢内核版本号后面的"+", 可以删除内核源代码中的.git目录。
+
