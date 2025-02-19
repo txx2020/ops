@@ -1,0 +1,11 @@
+ConfigMap
+ConfigMap 用来查看配置信息，常用的命令有：
+kubectl get cm -A
+
+步骤：
+创建文件夹，把配置文件放进去，一般是yaml文件
+可以采用键值对方式
+
+kubectl create configmap mc-name --from-literal=varible=aa
+
+ 
