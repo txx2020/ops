@@ -12,3 +12,6 @@ nginx也是实现负载均衡的，nginx是7层，ipvsadm是4层，nginx可以�
 
 临时生效的配置方式
 临时生效的配置方式，在系统重启，或对系统的网络服务进行重启后都会失效。这种方式可用于临时测试、或做实验时使用。
+            - name: IP_AUTODETECTION_METHOD
+              value: "can-reach=192.168.1.210"
+calico的配置，多网卡配置，比如指定必须要能访问这个ip，才可以加入

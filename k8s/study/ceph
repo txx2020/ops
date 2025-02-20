@@ -1,0 +1,18 @@
+分布式存储系统
+采用CRUSH算法，数据分布均衡，并行度高
+可容灾
+支持上千节点
+高可用
+去中心化
+
+Monitor：Ceph集群需要多个Monitor组成，通过Paxos同步数据，保存OSD元数据
+OSD：Object Storage Device,服务响应客户端请求返回具体数据的进程，要有多个
+MDS：Ceph Meta打它Server,是CephFS服务依赖的元数据服务
+Object：Ceph最底层的存储单元，包含元数据和原始数据
+PG：逻辑的概念，一个PG多个OSD
+RADOS：数据分配，Failover等集群操作
+Libradio：Rados提供库，上层的服务RBD、RGW、CephFS等都是基于Librados访问的
+CRUSH：数据分布算法，让数据分配达到预期
+RBD：对外提供的块设备服务
+RGW：对外的对象存储服务，接口与S3和Swift兼容
+CephFS：对外提供的文件系统服务
