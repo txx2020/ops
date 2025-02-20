@@ -1,0 +1,125 @@
+如何查看Linux系统的性能瓶颈？
+
+top或htop查看CPU和内存使用情况。
+iostat查看磁盘I/O性能。
+vmstat查看虚拟内存统计。
+netstat或ss查看网络连接和统计。
+sar进行系统活动报告。
+
+解释什么是inode以及它的作用
+
+ 描述Linux中软链接和硬链接之间的区别
+
+如何设置内核参数
+内核参数可以通过sysctl工具设置。可以临时设置，如sysctl -w parameter=value，也可以永久设置，通过将参数添加到/etc/sysctl.conf文件中，然后使用sysctl -p加载。
+
+解释什么是SELinux以及其作用
+SELinux（Security-Enhanced Linux）是一个Linux内核安全模块，提供了基于访问控制策略的安全防护。它可以限制进程和用户对文件、目录和端口的访问
+
+如何在Linux中配置IP地址
+可以使用ip或ifconfig命令手动配置IP地址，例如，使用ip addr add 192.168.1.2/24 dev eth0命令为eth0接口设置IP地址。也可以通过编辑网络配置文件或使用网络管理器进行配置
+
+解释Shell脚本中的条件语句
+Shell脚本支持if-else和case语句来进行条件判断。if-else语句格式如下：
+
+if [ condition ]; then
+  # commands
+elif [ condition ]; then
+  # commands
+else
+  # commands
+fi
+case语句格式如下：
+
+case $variable in
+pattern1) 
+  # commands
+  ;;
+pattern2)
+  # commands
+  ;;
+*)
+  # default commands
+  ;;
+esac
+
+
+如何在Shell脚本中进行循环迭代
+for循环示例：
+for variable in list; do
+  # commands
+done
+while循环示例：
+while [ condition ]; do
+  # commands
+done
+until循环示例：
+until [ condition ]; do
+  # commands
+done
+
+
+如何在Shell脚本中捕获和使用函数的返回值
+ 在Shell脚本中，函数的返回值通过return语句指定。可以通过$?特殊变量捕获上一个命令或函数的退出状态。
+
+function_name() {
+  # commands
+  return value
+}
+
+function_name
+echo $?  # 输出function_name的返回值
+
+
+解释Shell脚本中的数组和如何使用它们
+Shell脚本支持一维数组。可以使用括号()声明数组，使用空格分隔元素。访问数组元素时，使用${array_name[index]}语法。
+
+array_name=(element1 element2 element3)
+echo ${array_name[0]}  # 访问第一个元素
+echo ${array_name[@]}  # 访问所有元素
+
+
+
+如何在Shell脚本中重定向输出和输入
+使用&gt;将命令的输出重定向到文件中，如果文件已存在，则覆盖。
+使用&gt;&gt;将命令的输出追加到文件中。
+使用&lt;将文件的内容作为命令的输入。
+使用2&gt;重定向错误输出。
+
+
+
+解释Shell脚本中的错误处理和调试技巧。
+错误处理可以通过检查命令的退出状态来实现。Shell脚本中的set -e选项可使脚本在遇到错误时立即退出。调试Shell脚本时，可以使用set -x选项在执行时显示命令和它们的参数
+
+
+什么是OSI模型？它的七层分别是什么？二层和三层交换机有什么区别
+OSI（开放式系统互连）模型是一个参考模型，用于理解和设计计算机网络的工作流程。七层分别是：物理层、数据链路层、网络层、传输层、会话层、表示层和应用层。
+
+
+TCP和UDP的区别是什么
+TCP（传输控制协议）是一种面向连接的、可靠的、基于字节流的传输层通信协议。UDP（用户数据报协议）是一种无连接的、不可靠的、基于消息的协议
+
+TCp三次握手和四次挥手
+
+什么是SSL/TLS，它如何工作
+SSL（安全套接字层）和TLS（传输层安全）是用于在互联网上提供加密通信的协议。它们通过使用公钥和私钥加密技术来保证数据的安全传输
+
+
+nginx location匹配规则
+
+数据库主从复制原理
+
+
+解释一下读写分离
+
+主数据库宕机了，应该怎么处理
+
+事务的4个特征，什么事数据库回滚
+
+http状态码有哪些，分别代表什么
+
+查看网络tcp连接状态
+
+redis集群
+
+https://blog.csdn.net/easylife206/article/details/142199897
