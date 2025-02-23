@@ -11,6 +11,6 @@ dconf write /org/gnome/terminal/legacy/keybindings/prev-tab "'<Ctrl><Shift>Tab'"
 
 killall gnome-terminal
 gnome-terminal
-#test222
+#test222aa
 # 如果一不小心提前修改了，需要恢复默认设置
 dconf reset -f /org/
