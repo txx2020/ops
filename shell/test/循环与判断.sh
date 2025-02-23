@@ -12,3 +12,12 @@ for iuser   in "${com1[@]}" ; do
        echo "  ";
     fi;
 done;
+
+names=(
+job
+aob
+bob
+)
+for name in  '${job[@]}';do
+   echo '1';
+done
