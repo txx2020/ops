@@ -142,3 +142,9 @@ http状态码有哪些，分别代表什么
 redis集群
 
 https://blog.csdn.net/easylife206/article/details/142199897
+
+
+mysql的Innodb和和MYISAM区别：
+Innodb是行级事务，支持外键，支持高并发等场景
+MYISAM是表级事务，查询速度快。
+
