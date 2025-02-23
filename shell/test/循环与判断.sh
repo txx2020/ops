@@ -18,6 +18,6 @@ job
 aob
 bob
 )
-for name in  '${job[@]}';do
+for name in  "${names[@]}";do
    echo '1';
 done
