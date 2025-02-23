@@ -1,0 +1,4 @@
+# 安装搜狗输入法
+vi /etc/gdm3/custom.conf
+
+WaylandEnable=false
