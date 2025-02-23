@@ -2,3 +2,15 @@
 vi /etc/gdm3/custom.conf
 
 WaylandEnable=false
+
+
+#修改terminal快捷键
+
+dconf write /org/gnome/terminal/legacy/keybindings/next-tab "'<Ctrl>Tab'"
+dconf write /org/gnome/terminal/legacy/keybindings/prev-tab "'<Ctrl><Shift>Tab'"
+
+killall gnome-terminal
+gnome-terminal
+
+# 如果一不小心提前修改了，需要恢复默认设置
+dconf reset -f /org/
