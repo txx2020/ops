@@ -1,0 +1,2 @@
+# 查看块大小，判断数据库表格最大大小
+getconf PAGESIZE
