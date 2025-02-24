@@ -1,2 +1,8 @@
 # 查看块大小，判断数据库表格最大大小
 getconf PAGESIZE
+
+操作系统块大小	最大文件尺寸	最大文件系统尺寸
+1KB	16GB	2TB
+2KB	256GB	8TB
+4KB	2TB	16TB
+8KB	16TB	32TB

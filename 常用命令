@@ -108,3 +108,6 @@ bindkey "\e[4~" end-of-line  # End键
 # 网络丢包率测试
 iperf3 -s # 服务器端安装
 iperf3 -c ip # 客户端安装
+
+# 监听网络icmp连接
+tcpdump -i ens33 icmp and src 192.168.1.210
