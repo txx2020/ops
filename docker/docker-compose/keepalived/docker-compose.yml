@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  keepalived:
+    image: tongtu-keepalived:2.0.20
+    container_name: keepalived
+    privileged: true
+    network_mode: "host"
+    volumes:
+      - ./assets:/container/service/keepalived/assets
+#    environment:  # 不写配置文件的情况下启用
+#      KEEPALIVED_INTERFACE: ens160 #自己的网卡
+#      KEEPALIVED_UNICAST_PEERS: "42.64.34.131" #其它机器ip
+#      KEEPALIVED_VIRTUAL_IPS: "42.64.34.230" #漂移ip
+    restart: always
+    extra_hosts:
+      - "geoserver1:42.64.34.130"
+      - "geoserver2:42.64.34.131"
+      - "nginx1:42.64.34.128"
+      - "nginx2:42.64.34.129"
+      - "nginx3:172.15.52.20"
+      - "nginx4:172.15.52.21"
