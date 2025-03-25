@@ -113,3 +113,6 @@ iperf3 -c ip # 客户端安装
 tcpdump -i ens33 icmp and src 192.168.1.210
 
 docker network create nginx_net
+
+# postgres 自增序列
+SELECT setval('gzb_toll_duty_notice_id_seq', 7)
