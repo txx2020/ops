@@ -116,3 +116,7 @@ docker network create nginx_net
 
 # postgres 自增序列
 SELECT setval('gzb_toll_duty_notice_id_seq', 7)
+
+# mongo删除数据
+db.cars.find();
+db.cars.deleteOne({ company_name: "知了物流有限公司" });
