@@ -113,3 +113,15 @@ ansible k8s -m shell -a 'docker rm $(docker ps -a -f status=exited -q)'
 
 kubeadm join 192.168.1.210:6443 --token fu98ao.ptrr9ekw34a9o27b \
 	--discovery-token-ca-cert-hash sha256:1951ec82a593f7970b53ce7d75c71c3054c248a773fa6a89d7c845c297118850
+
+# 添加控制平面需要执行以下操作：
+
+kubectl -n kube-system edit cm kubeadm-config
+# 添加以下信息：
+kubernetesVersion: v1.22.1  # 在这行下面
+controlPlaneEndpoint: "192.168.1.210:6443"
+
+# 生成证书 certificate-key，下面要用到
+kubeadm init phase upload-certs --upload-certs
+
+kubeadm join 192.168.1.210:6443 --token rwzx81.t5gk4yzwf165semj --discovery-token-ca-cert-hash sha256:1951ec82a593f7970b53ce7d75c71c3054c248a773fa6a89d7c845c297118850 --control-plane  --certificate-key 95a1fce3b979403770084c9ddfe0969bbdc9b80a526aed83c36997acb0ff57fb --cri-socket unix:///var/run/cri-dockerd.sock
