@@ -9,3 +9,5 @@ kubectl create configmap cm-activemq \
 --from-file=activemq0=activemq0.xml \
 --from-file=activemq1=activemq1.xml \
 --from-file=activemq2=activemq2.xml ;
+
+kubectl create cm  security-config --from-file=security-dev=application.yml;
