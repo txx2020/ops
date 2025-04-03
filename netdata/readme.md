@@ -73,3 +73,9 @@ EOF
 ```bash
 systemctl restart netdata
 ```
+增加一个会常用的命令，因为默认配置关闭了许多功能，如果开启可以使用ansible开启
+```
+ansible total -m shell -a "sed -i 's/go.d = no[[:space:]]*$/go.d = yes/g' /opt/netdata/etc/netdata/netdata.conf"
+ansible total -m copy -a 'src=/opt/netdata/etc/netdata/docker.conf dest=/opt/netdata/etc/netdata/docker.conf'
+ansible total -m shell -a 'systemctl restart netdata'
+```
