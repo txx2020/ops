@@ -69,7 +69,7 @@ jobs:
     collect_container_size: no
 EOF
 ```
-重启netdata后开始手机监控
+重启netdata后开始收集监控
 ```bash
 systemctl restart netdata
 ```
